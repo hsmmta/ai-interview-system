@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DBUtil {
-    private static final String DB_URL = "jdbc:sqlite:interview.db";
+    private static final String DB_URL = "jdbc:sqlite:E:/项目网站/ai-assistant/interview.db";
 
     static {
         try {

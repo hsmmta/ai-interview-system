@@ -78,10 +78,26 @@ const answers = computed(() => resultData.value?.answers || [])
 const formattedEvaluation = computed(() => {
   if (!resultData.value?.evaluation?.realtime_evaluation) return ''
   let text = resultData.value.evaluation.realtime_evaluation
-  // Simple markdown to HTML
+
+  // Headers
+  text = text.replace(/^####\s+(.*$)/gm, '<h4 class="md-h4">$1</h4>')
+  text = text.replace(/^###\s+(.*$)/gm, '<h3 class="md-h3">$1</h3>')
+  text = text.replace(/^##\s+(.*$)/gm, '<h2 class="md-h2">$1</h2>')
+  text = text.replace(/^#\s+(.*$)/gm, '<h1 class="md-h1">$1</h1>')
+
+  // Bold (**text**)
   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-  text = text.replace(/\n\n/g, '<br><br>')
+
+  // Lists
+  text = text.replace(/^\s*-\s+(.*$)/gm, '<li class="md-li">$1</li>')
+  text = text.replace(/^\s*\d+\.\s+(.*$)/gm, '<div class="md-list-item"><span class="list-num"></span> $1</div>')
+
+  // Newlines:
+  // 1. First, temporarily replace headers/lists to avoid messing them up with <br>
+  // Actually, simpler: replace \n with <br>, but try to avoid double <br> after block elements
+  // Let's just do safe replacement
   text = text.replace(/\n/g, '<br>')
+
   return text
 })
 
@@ -191,6 +207,31 @@ h3 {
   color: #444;
 }
 
+.md-h1, .md-h2, .md-h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.md-h3 {
+  font-size: 1.1rem;
+}
+
+.md-h4 {
+  font-size: 1.05rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #555;
+  font-weight: 600;
+}
+
+.md-li {
+  margin-left: 1.5rem;
+  margin-bottom: 0.25rem;
+  list-style-type: disc;
+}
+
 .qa-item {
   margin-bottom: 1.5rem;
   border-bottom: 1px solid #f9f9f9;
@@ -235,4 +276,3 @@ h3 {
   color: #666;
 }
 </style>
-

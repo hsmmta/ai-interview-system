@@ -75,29 +75,53 @@ def run_interview_flow(user_info):
 
 def extract_core_questions(questions_text):
     """
-    修复：正确解析生成的面试问题文本，提取「核心问题+考察点」（解决题干不显示问题）
+    解析生成的面试问题文本
+    返回完整的题目块（包含背景和所有追问），交给前端去解析结构
     """
     try:
-        # 优化正则：匹配【问题X】+ 考察点 + 具体问题
-        pattern = r"【问题\d+】\s*（考察点：.+?）\s*(.+?)(?=\n- 追问|\n\n|$)"
-        matches = re.findall(pattern, questions_text, re.DOTALL)
+        # 优化正则：匹配【问题X】开始直到下一个问题或文件结束
+        # DOTALL模式下 . 匹配换行
+        # 我们寻找 【问题\d+】作为分隔符
+
+        # 简单清洗
+        text = questions_text.strip()
+
+        # 使用 split 切分
+        # pattern: (【问题\d+】.*?)(?=【问题\d+】|$)
+        # 但是 re.split 会更好
+
+        matches = re.finditer(r"【问题\d+】", text)
+        indices = [m.start() for m in matches]
+        indices.append(len(text))
 
         core_questions = []
-        for match in matches:
-            # 清洗多余空格和换行，拼接「考察点+问题」
-            question = match.strip().replace("\n", "").replace("  ", " ")
-            if question:
-                core_questions.append(question)
+        for i in range(len(indices) - 1):
+            start = indices[i]
+            end = indices[i+1]
+            segment = text[start:end].strip()
 
-        # 兜底：若解析失败，用默认问题列表
+            # 去除 【问题X】 标题本身，或者保留?
+            # 前端 parseQuestionContent 期望的是内容。
+            # 通常 【问题X】是标题，后面是内容 (考察点...) Context ... - 追问
+
+            # 去除标题 【问题\d+】
+            segment_content = re.sub(r"^【问题\d+】", "", segment).strip()
+
+            if segment_content:
+                core_questions.append(segment_content)
+
         if not core_questions:
-            core_questions = [
-                "请解释Python中可变对象（如list, dict）和不可变对象（如int, str, tuple）的区别，并举例说明在函数参数传递时的行为差异？",
-                "请描述Flask应用从接收HTTP请求到返回响应的完整生命周期，以及请求上下文和程序上下文的作用？",
-                "请比较SQLAlchemy ORM和原生SQL的优缺点，以及N+1查询问题的产生原因和解决方法？",
-                "请解释Python的GIL（全局解释器锁），并说明多线程和多进程的适用场景？",
-                "请说明Flask蓝图（Blueprint）的作用、使用场景和注册方式？"
+             # Fallback logic if regex finds nothing
+             logger.warning("Regex split found no questions, returning full text or fallback")
+             # Try simple line split check
+             if "【问题" not in text:
+                 return [text] # Just return as one chunk to be safe?
+
+             core_questions = [
+                "请解释Python中可变对象（如list, dict）和不可变对象（如int, str, tuple）的区别，并举例说明在函数参数传递时的行为差异？\n- 追问：深拷贝和浅拷贝的区别？",
+                "请描述Flask应用从接收HTTP请求到返回响应的完整生命周期？\n- 追问：请求上下文和程序上下文的作用？"
             ]
+
         return core_questions
     except Exception as e:
         logger.warning(f"解析问题失败：{str(e)}，使用默认问题列表")

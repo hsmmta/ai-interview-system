@@ -11,23 +11,23 @@
       <div v-else class="info-list">
         <div class="info-item">
           <label>用户ID</label>
-          <span>{{ user.id }}</span>
+          <span>{{ user.id || '未知' }}</span>
         </div>
         <div class="info-item">
           <label>姓名</label>
-          <span>{{ user.name }}</span>
+          <span>{{ user.name || '未设置' }}</span>
         </div>
         <div class="info-item">
           <label>手机号</label>
-          <span>{{ user.phone }}</span>
+          <span>{{ user.phone || '未知' }}</span>
         </div>
         <div class="info-item">
           <label>意向岗位</label>
-          <span class="tag">{{ user.intent }}</span>
+          <span class="tag">{{ user.targetPosition || user.intent || '未设置' }}</span>
         </div>
         <div class="info-item">
           <label>注册时间</label>
-          <span>{{ user.createdAt }}</span>
+          <span>{{ user.createdAt || '-' }}</span>
         </div>
       </div>
 
@@ -201,4 +201,3 @@ button {
   color: #333;
 }
 </style>
-

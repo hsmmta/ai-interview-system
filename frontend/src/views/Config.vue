@@ -63,6 +63,7 @@ import axios from 'axios'
 
 const router = useRouter()
 const mode = ref('text')
+const interviewType = ref('campus')
 const questionCount = ref(15)
 const userIntent = ref('')
 const loading = ref(false)
@@ -242,4 +243,3 @@ input[type="number"] {
   cursor: not-allowed;
 }
 </style>
-

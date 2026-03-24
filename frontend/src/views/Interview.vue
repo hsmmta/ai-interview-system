@@ -19,20 +19,35 @@
     <div class="main-content">
       <div v-if="currentQuestion" class="question-card">
         <div class="card-header">
-          <span class="question-number">{{ currentIndex + 1 }}/{{ questions.length }}</span>
-          <span class="question-type">{{ currentQuestion.type === 'coding' ? '编程题' : '简答题' }}</span>
+          <div class="header-left">
+            <span class="question-number">{{ currentIndex + 1 }}/{{ questions.length }}</span>
+            <span class="question-type">{{ currentQuestion.type === 'coding' ? '编程题' : '简答题' }}</span>
+          </div>
         </div>
 
         <div class="question-body">
-          <p class="question-text">{{ currentQuestion.question }}</p>
-        </div>
+          <!-- Context/Main Body -->
+          <div v-if="parsedContent.context" class="q-context">
+            {{ parsedContent.context }}
+          </div>
 
-        <div class="answer-area">
-          <textarea
-            v-model="answers[currentIndex]"
-            placeholder="在此输入您的回答..."
-            rows="10"
-          ></textarea>
+          <!-- Sub Questions -->
+          <div v-for="(subQ, idx) in parsedContent.subs" :key="idx" class="sub-q-item">
+            <div class="sub-q-label" v-if="parsedContent.subs.length > 1">
+              问题 {{ idx + 1 }}: {{ subQ }}
+            </div>
+            <div class="sub-q-label" v-else>
+              {{ subQ }}
+            </div>
+
+            <textarea
+              v-model="currentSubAnswers[idx]"
+              class="sub-answer-box"
+              :placeholder="parsedContent.subs.length > 1 ? `请输入问题 ${idx + 1} 的回复...` : '请输入你的回答...'"
+              @input="syncAnswer"
+              rows="6"
+            ></textarea>
+          </div>
         </div>
 
         <div class="card-footer">
@@ -71,7 +86,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 
@@ -82,7 +97,91 @@ const answers = ref([])
 const currentIndex = ref(0)
 const loading = ref(true)
 
+// Stores parsing state for each question to avoid re-parsing
+const questionStates = ref({})
+
 const currentQuestion = computed(() => questions.value[currentIndex.value])
+
+const parsedContent = computed(() => {
+  if (!currentQuestion.value) return { context: '', subs: [] }
+  return getParsedState(currentIndex.value).parsed
+})
+
+const currentSubAnswers = computed(() => {
+  return getParsedState(currentIndex.value).subAnswers
+})
+
+// Logic adapted from JSP parseQuestionContent
+const parseQuestionContent = (content) => {
+  if (!content) return { context: "", subs: [] };
+  // Check for structure
+  if (!content.includes("\n") || !/-\s/.test(content)) {
+       return { context: "", subs: [content] };
+  }
+
+  const lines = content.split('\n');
+  let contextLines = [];
+  let subs = [];
+  let foundFirstBullet = false;
+
+  lines.forEach(line => {
+      const trimmed = line.trim();
+      // Match "- " or "- 追问" start
+      if (trimmed.startsWith("-")) {
+          foundFirstBullet = true;
+          // Clean prefixes
+          let clean = trimmed.replace(/^-\s*(追问\d*[：:]?)?\s*/, '');
+          subs.push(clean);
+      } else {
+          if (!foundFirstBullet) {
+              contextLines.push(line);
+          } else {
+              if (subs.length > 0) {
+                  subs[subs.length - 1] += "\n" + line;
+              } else {
+                  contextLines.push(line);
+              }
+          }
+      }
+  });
+
+  return {
+      context: contextLines.join('\n').trim(),
+      subs: subs.length > 0 ? subs : [content]
+  };
+}
+
+const getParsedState = (index) => {
+  if (!questionStates.value[index]) {
+    const q = questions.value[index]
+    const parsed = parseQuestionContent(q.question || q.content)
+    // Initialize subAnswers from existing answer if possible, or empty
+    // If we are reloading answers from storage, we might need logic to split them back?
+    // For now assuming empty or flat string.
+    // Let's keep it simple: empty array
+    let initialSubs = new Array(parsed.subs.length).fill('')
+
+    // Attempt to restore if already answered (simple restore)
+    if (answers.value[index]) {
+       // Heuristic: If we joined by \n---\n, split by it?
+       // For now, if single string exists, put it in first box
+       initialSubs[0] = answers.value[index]
+    }
+
+    questionStates.value[index] = {
+      parsed: parsed,
+      subAnswers: initialSubs
+    }
+  }
+  return questionStates.value[index]
+}
+
+const syncAnswer = () => {
+  const state = getParsedState(currentIndex.value)
+  // Join sub-answers to form single string for storage/submission
+  // Using a distinct separator to possibly reconstruct later if needed
+  answers.value[currentIndex.value] = state.subAnswers.join('\n\n')
+}
 
 const isAnswered = (index) => {
   return answers.value[index] && answers.value[index].trim().length > 0
@@ -100,9 +199,6 @@ onMounted(() => {
   }
 
   if (questions.value.length === 0) {
-    // If no questions, maybe redirect back to config or load from API
-    // Try fetch from API if session storage empty (e.g. refresh)
-    // For now redirect
     alert('未找到题目，请重新配置')
     router.push('/config')
   }
@@ -110,7 +206,6 @@ onMounted(() => {
 })
 
 const jumpTo = (index) => {
-  // Optional: save logic or validation
   currentIndex.value = index
 }
 
@@ -136,10 +231,6 @@ const submitAll = async () => {
       }))
     }
 
-    // Using axios for submission
-    // URL might be /api/interview/submit or /api/interview/evaluate
-    // Based on user context, likely /api/interview/result logic handles evaluation or separate endpoint
-    // Assuming backend endpoint /api/submit or similar for Vue
     const res = await axios.post('/api/interview/submit', payload)
 
     if (res.data.success || res.status === 200) {
@@ -200,37 +291,33 @@ const submitAll = async () => {
 }
 
 .question-list li.active {
-  background-color: #e6f7ff; /* Light blue */
-  color: #1890ff; /* Blue */
+  background-color: #e6f7ff;
+  color: #1890ff;
   font-weight: 600;
 }
 
 .question-list li.completed .status-dot {
-  background-color: #52c41a; /* Green */
+  background-color: #52c41a;
 }
 
 .status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #d9d9d9; /* Grey */
+  background-color: #d9d9d9;
   margin-right: 10px;
 }
 
 .btn-submit-all {
   margin-top: 1rem;
   padding: 0.75rem;
-  background: #ff4d4f; /* Red */
+  background: #ff4d4f;
   color: white;
   border: none;
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
   width: 100%;
-}
-
-.btn-submit-all:hover {
-  background: #ff7875;
 }
 
 .main-content {
@@ -277,17 +364,29 @@ const submitAll = async () => {
   font-size: 0.85rem;
 }
 
-.question-body {
+.q-context {
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #333;
+  padding: 10px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  border-left: 4px solid #667eea;
+}
+
+.sub-q-item {
   margin-bottom: 2rem;
 }
 
-.question-text {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  white-space: pre-wrap;
+.sub-q-label {
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
 }
 
-.answer-area textarea {
+.sub-answer-box {
   width: 100%;
   padding: 1rem;
   border: 1px solid #ddd;
@@ -295,10 +394,12 @@ const submitAll = async () => {
   font-family: inherit;
   font-size: 1rem;
   resize: vertical;
-  min-height: 150px;
+  min-height: 100px;
+  background: #fff;
+  transition: border-color 0.2s;
 }
 
-.answer-area textarea:focus {
+.sub-answer-box:focus {
   border-color: #667eea;
   outline: none;
 }
@@ -325,34 +426,16 @@ const submitAll = async () => {
   color: #666;
 }
 
-.btn-prev:hover:not(:disabled) {
-  border-color: #667eea;
-  color: #667eea;
-}
-
-.btn-prev:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .btn-next {
   background: #667eea;
   color: white;
   border: none;
 }
 
-.btn-next:hover {
-  background: #5a6fd1;
-}
-
 .btn-submit {
-  background: #52c41a; /* Green */
+  background: #52c41a;
   color: white;
   border: none;
-}
-
-.btn-submit:hover {
-  background: #73d13d;
 }
 
 .loading-state {
@@ -363,4 +446,3 @@ const submitAll = async () => {
   color: #888;
 }
 </style>
-
