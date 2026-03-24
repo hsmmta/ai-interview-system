@@ -93,10 +93,11 @@ const handleLogin = async () => {
   error.value = ''
 
   try {
-    const res = await axios.post('/api/login', new URLSearchParams({
+    const res = await axios.post('/api/login', {
+      action: 'verify',
       phone: phone.value,
       code: code.value
-    }))
+    })
 
     if (res.data.success || res.status === 200) {
       // Assuming successful login sets a cookie or returns a token

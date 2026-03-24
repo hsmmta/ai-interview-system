@@ -17,7 +17,7 @@ app.add_middleware(
 )
 
 print("⏳ 正在全局加载 SenseVoice 模型...")
-model = AutoModel(model="iic/SenseVoiceSmall", trust_remote_code=True, remote_code="./model.py", device="cuda:0")
+model = AutoModel(model="iic/SenseVoiceSmall", trust_remote_code=True, device="cuda:0")
 
 @app.post("/api/analyze-interview")
 async def analyze_audio_api(audio_file: UploadFile = File(...)):

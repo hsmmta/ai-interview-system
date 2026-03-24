@@ -134,7 +134,7 @@
                 <version>9.4.53.v20231009</version>
                 <configuration>
                     <httpConnector>
-                        <port>8080</port>
+                        <port>8081</port>
                     </httpConnector>
                     <webApp>
                         <contextPath>/</contextPath>
