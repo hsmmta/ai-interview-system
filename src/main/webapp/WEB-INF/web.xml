@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+         version="3.0">
+
+    <display-name>ai-assistant-web</display-name>
+
+    <welcome-file-list>
+        <welcome-file>login.jsp</welcome-file>
+    </welcome-file-list>
+
+    <session-config>
+        <session-timeout>30</session-timeout>
+    </session-config>
+
+    <!-- 登录验证码 -->
+    <servlet>
+        <servlet-name>LoginServlet</servlet-name>
+        <servlet-class>com.aiassistant.web.LoginServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LoginServlet</servlet-name>
+        <url-pattern>/api/login</url-pattern>
+    </servlet-mapping>
+
+    <!-- 面试配置（校招/社招、方向、题量） -->
+    <servlet>
+        <servlet-name>InterviewConfigServlet</servlet-name>
+        <servlet-class>com.aiassistant.web.InterviewConfigServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>InterviewConfigServlet</servlet-name>
+        <url-pattern>/api/interview/config</url-pattern>
+    </servlet-mapping>
+
+    <!-- 生成题目 -->
+    <servlet>
+        <servlet-name>GenerateQuestionsServlet</servlet-name>
+        <servlet-class>com.aiassistant.web.GenerateQuestionsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GenerateQuestionsServlet</servlet-name>
+        <url-pattern>/api/interview/generate</url-pattern>
+    </servlet-mapping>
+
+    <!-- 提交答案 -->
+    <servlet>
+        <servlet-name>SubmitAnswersServlet</servlet-name>
+        <servlet-class>com.aiassistant.web.SubmitAnswersServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SubmitAnswersServlet</servlet-name>
+        <url-pattern>/api/interview/submit</url-pattern>
+    </servlet-mapping>
+
+    <!-- 结果页数据 -->
+    <servlet>
+        <servlet-name>ResultServlet</servlet-name>
+        <servlet-class>com.aiassistant.web.ResultServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ResultServlet</servlet-name>
+        <url-pattern>/api/interview/result</url-pattern>
+    </servlet-mapping>
+
+    <!-- 注册 -->
+    <servlet>
+        <servlet-name>RegisterServlet</servlet-name>
+        <servlet-class>com.aiassistant.web.RegisterServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>RegisterServlet</servlet-name>
+        <url-pattern>/api/register</url-pattern>
+    </servlet-mapping>
+
+    <!-- 个人中心 -->
+    <servlet>
+        <servlet-name>ProfileServlet</servlet-name>
+        <servlet-class>com.aiassistant.web.ProfileServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ProfileServlet</servlet-name>
+        <url-pattern>/api/profile</url-pattern>
+    </servlet-mapping>
+
+</web-app>

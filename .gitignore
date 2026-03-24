@@ -1,0 +1,67 @@
+### IntelliJ IDEA ###
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+.kotlin
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+
+# Local environment secrets
+.env
+
+### Python ###
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+*.egg-info/
+
+### Java / Maven ###
+target/
+*.iml
+.idea/
+
+### Database ###
+*.db
+*.sqlite3
+*.sqlite
+*.bak
+
+### Logs ###
+*.log
+logs/
+
+### Audio / Temp Files ###
+temp_*.wav
+temp_*.mp3
+*.tmp
+
+### Windows ###
+Thumbs.db
+desktop.ini
