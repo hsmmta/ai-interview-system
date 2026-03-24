@@ -64,6 +64,16 @@
         <url-pattern>/api/interview/result</url-pattern>
     </servlet-mapping>
 
+    <!-- 退出登录 -->
+    <servlet>
+        <servlet-name>LogoutServlet</servlet-name>
+        <servlet-class>com.aiassistant.web.LogoutServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LogoutServlet</servlet-name>
+        <url-pattern>/api/logout</url-pattern>
+    </servlet-mapping>
+
     <!-- 注册 -->
     <servlet>
         <servlet-name>RegisterServlet</servlet-name>
