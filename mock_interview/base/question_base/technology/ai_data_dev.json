@@ -1,0 +1,154 @@
+{
+  "tech_ai_data_dev": [
+    {
+      "id": "0001",
+      "dimension": "大数据组件原理",
+      "difficulty": "低级",
+      "content": "简述Hadoop的核心组件及各自作用"
+    },
+    {
+      "id": "0002",
+      "dimension": "大数据组件原理",
+      "difficulty": "中级",
+      "content": "Flink和Spark的核心区别是什么？各自适用场景？"
+    },
+    {
+      "id": "0003",
+      "dimension": "大数据组件原理",
+      "difficulty": "低级",
+      "content": "什么是Kafka？它在数据集成中的作用是什么？"
+    },
+    {
+      "id": "0004",
+      "dimension": "大数据组件原理",
+      "difficulty": "中级",
+      "content": "简述HDFS的存储机制和高可用原理"
+    },
+    {
+      "id": "0005",
+      "dimension": "大数据组件原理",
+      "difficulty": "高级",
+      "content": "YARN的资源调度流程是什么？如何优化调度效率？"
+    },
+    {
+      "id": "0006",
+      "dimension": "数据开发与ETL",
+      "difficulty": "低级",
+      "content": "什么是ETL？简述ETL的完整流程"
+    },
+    {
+      "id": "0007",
+      "dimension": "数据开发与ETL",
+      "difficulty": "中级",
+      "content": "常用的数据同步工具有哪些？核心原理是什么？"
+    },
+    {
+      "id": "0008",
+      "dimension": "数据开发与ETL",
+      "difficulty": "低级",
+      "content": "如何实现增量数据抽取？有哪些常用方式？"
+    },
+    {
+      "id": "0009",
+      "dimension": "数据开发与ETL",
+      "difficulty": "中级",
+      "content": "数据倾斜的表现是什么？如何解决数据倾斜问题？"
+    },
+    {
+      "id": "0010",
+      "dimension": "数据开发与ETL",
+      "difficulty": "高级",
+      "content": "如何设计高性能的实时数据ETL流程？"
+    },
+    {
+      "id": "0011",
+      "dimension": "数据治理",
+      "difficulty": "低级",
+      "content": "什么是数据治理？核心目标是什么？"
+    },
+    {
+      "id": "0012",
+      "dimension": "数据治理",
+      "difficulty": "中级",
+      "content": "数据质量监控的维度有哪些？如何保障数据质量？"
+    },
+    {
+      "id": "0013",
+      "dimension": "数据治理",
+      "difficulty": "低级",
+      "content": "脏数据有哪些类型？对应的处理方式是什么？"
+    },
+    {
+      "id": "0014",
+      "dimension": "数据治理",
+      "difficulty": "中级",
+      "content": "什么是元数据？元数据管理的作用是什么？"
+    },
+    {
+      "id": "0015",
+      "dimension": "编程语言基础",
+      "difficulty": "低级",
+      "content": "Python处理数据的常用库有哪些？各自作用？"
+    },
+    {
+      "id": "0016",
+      "dimension": "编程语言基础",
+      "difficulty": "中级",
+      "content": "Python中迭代器和生成器在大数据处理中的优势？"
+    },
+    {
+      "id": "0017",
+      "dimension": "编程语言基础",
+      "difficulty": "低级",
+      "content": "Java集合类在数据存储中的选型依据？"
+    },
+    {
+      "id": "0018",
+      "dimension": "编程语言基础",
+      "difficulty": "中级",
+      "content": "如何用Python实现高效的数据清洗脚本？"
+    },
+    {
+      "id": "0019",
+      "dimension": "计算机基础",
+      "difficulty": "低级",
+      "content": "简述进程和线程的区别，在大数据计算中的应用"
+    },
+    {
+      "id": "0020",
+      "dimension": "计算机基础",
+      "difficulty": "中级",
+      "content": "内存管理对大数据处理的影响是什么？如何优化？"
+    },
+    {
+      "id": "0021",
+      "dimension": "AI数据融合",
+      "difficulty": "中级",
+      "content": "AI建模前需要做哪些数据预处理工作？"
+    },
+    {
+      "id": "0022",
+      "dimension": "AI数据融合",
+      "difficulty": "低级",
+      "content": "什么是知识图谱？数据开发中如何落地应用？"
+    },
+    {
+      "id": "0023",
+      "dimension": "AI数据融合",
+      "difficulty": "中级",
+      "content": "如何为AI模型构建高质量的训练数据集？"
+    },
+    {
+      "id": "0024",
+      "dimension": "大数据组件原理",
+      "difficulty": "低级",
+      "content": "Hive的作用是什么？和传统数据库的区别？"
+    },
+    {
+      "id": "0025",
+      "dimension": "数据开发与ETL",
+      "difficulty": "高级",
+      "content": "如何实现离线计算和实时计算的数据互通？"
+    }
+  ]
+}

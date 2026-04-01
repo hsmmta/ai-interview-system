@@ -1,0 +1,388 @@
+{
+  "project_experience": [
+    {
+      "id": "0001",
+      "dimension": "工程实践与运维",
+      "keyword_tag": [],
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "请挑选你最核心的一个项目，说说你遇到过最棘手的技术瓶颈是什么？你是如何逐层定位、分析并落地解决的？"
+    },
+    {
+      "id": "0002",
+      "dimension": "编程语言核心",
+      "keyword_tag": [],
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "在你的项目中，为什么选用这门编程语言/这套框架？当时对比过哪些替代方案？权衡依据是什么？"
+    },
+    {
+      "id": "0003",
+      "dimension": "计算机基础",
+      "keyword_tag": [],
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "你的项目在运行效率、内存或资源占用上有没有做过优化？具体优化点和实现细节分别是什么？"
+    },
+    {
+      "id": "0004",
+      "dimension": "数据结构",
+      "keyword_tag": [],
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "你在项目中核心数据是如何组织与存储的？选用了什么数据结构？为什么这样设计？"
+    },
+    {
+      "id": "0005",
+      "dimension": "数据库与缓存",
+      "keyword_tag": [],
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "介绍你项目里的数据表结构设计思路，核心字段、关联关系、索引策略是如何考虑的？"
+    },
+    {
+      "id": "0006",
+      "dimension": "工程实践与运维",
+      "keyword_tag": [],
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "你的项目是如何拆分模块的？模块之间如何解耦、如何调用？有没有考虑可扩展性？"
+    },
+    {
+      "id": "0007",
+      "dimension": "算法设计",
+      "keyword_tag": [],
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "项目中有没有自研或改造过核心算法逻辑？算法复杂度如何？有没有做过降级或优化？"
+    },
+    {
+      "id": "0008",
+      "dimension": "工程实践与运维",
+      "keyword_tag": [],
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "你的项目中考虑了哪些异常、边界和容错场景？对应的处理逻辑是怎么实现的？"
+    },
+    {
+      "id": "0009",
+      "dimension": "数据库与缓存",
+      "keyword_tag": [],
+      "difficulty": "高级",
+      "applicable_post": ["通用"],
+      "content": "如果你的项目存在并发读写场景，你是如何保证数据一致性、避免脏读写问题的？"
+    },
+    {
+      "id": "0010",
+      "dimension": "计算机基础",
+      "keyword_tag": [],
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "项目涉及接口或网络调用时，你是如何处理超时、重试、熔断等稳定性问题的？"
+    },
+    {
+      "id": "0011",
+      "dimension": "工程实践与运维",
+      "keyword_tag": [],
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "回头看你的项目，你觉得最大的技术短板或技术债务在哪里？如果重做一次你会怎么改？"
+    },
+    {
+      "id": "0012",
+      "dimension": "编程语言核心",
+      "keyword_tag": [],
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "你在项目使用框架时踩过什么底层坑？你是如何定位原因、规避并解决问题的？"
+    },
+    {
+      "id": "0013",
+      "dimension": "数据库与缓存",
+      "keyword_tag": [],
+      "difficulty": "高级",
+      "applicable_post": ["通用"],
+      "content": "项目中引入缓存来加速查询时，你如何解决缓存穿透、击穿、雪崩三大问题？"
+    },
+    {
+      "id": "0014",
+      "dimension": "编程语言核心",
+      "keyword_tag": [],
+      "difficulty": "高级",
+      "applicable_post": ["通用"],
+      "content": "你的项目遇到过内存溢出OOM吗？你如何定位堆栈、分析原因并彻底解决？"
+    },
+    {
+      "id": "0015",
+      "dimension": "计算机基础",
+      "keyword_tag": [],
+      "difficulty": "高级",
+      "applicable_post": ["通用"],
+      "content": "你的项目是否分布式架构？节点如何协同？如何做容灾和故障转移？"
+    },
+    {
+      "id": "0016",
+      "dimension": "工程实践与运维",
+      "keyword_tag": [],
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "你的项目有没有自动化打包、发布、上线流程？整个部署链路是怎样的？"
+    },
+    {
+      "id": "0017",
+      "dimension": "数据结构",
+      "keyword_tag": [],
+      "difficulty": "高级",
+      "applicable_post": ["通用"],
+      "content": "面对海量数据查询变慢，你会从分片、索引、路由三个角度如何优化？"
+    },
+    {
+      "id": "0018",
+      "dimension": "工程实践与运维",
+      "keyword_tag": [],
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "你的项目日志和埋点是如何设计的？线上出现问题如何依靠日志快速回溯定位？"
+    },
+    {
+      "id": "0019",
+      "dimension": "算法设计",
+      "keyword_tag": ["模型训练", "loss震荡", "精度调优"],
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你的算法项目训练不收敛、loss震荡或精度不达预期时，你会从哪些维度逐项排查？具体步骤是什么？"
+    },
+    {
+      "id": "0020",
+      "dimension": "数据结构",
+      "keyword_tag": ["样本构造", "正负样本", "数据分布"],
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你的算法项目中样本分布是否不均衡？你采用了哪些采样、加权、增强手段来解决？"
+    },
+    {
+      "id": "0021",
+      "dimension": "数据库与缓存",
+      "keyword_tag": ["特征工程", "特征存储", "特征回溯"],
+      "difficulty": "高级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你的特征工程是如何设计的？特征如何存储、更新、去重，如何避免特征穿越问题？"
+    },
+    {
+      "id": "0022",
+      "dimension": "工程实践与运维",
+      "keyword_tag": ["离线在线", "推理部署", "链路打通"],
+      "difficulty": "高级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "说说你从离线实验到在线部署的完整链路，中间做了哪些适配、压缩、对齐、验证工作？"
+    },
+    {
+      "id": "0023",
+      "dimension": "计算机基础",
+      "keyword_tag": ["推理延迟", "吞吐优化", "TensorRT", "ONNX"],
+      "difficulty": "高级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你的模型上线后推理延迟偏高，你会从模型、工程、硬件三个层面分别如何优化？"
+    },
+    {
+      "id": "0024",
+      "dimension": "算法设计",
+      "keyword_tag": ["评估指标", "阈值调优", "业务适配"],
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你的算法采用了哪些评估指标？不同指标冲突时，你如何权衡并调整模型阈值？"
+    },
+    {
+      "id": "0025",
+      "dimension": "编程语言核心",
+      "keyword_tag": ["PyTorch", "TensorFlow", "环境适配", "依赖冲突"],
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你的算法项目选用PyTorch而非TensorFlow/JAX的核心原因是什么？两者在训练、调试、生态上的差异你是如何考量的？"
+    },
+    {
+      "id": "0026",
+      "dimension": "工程实践与运维",
+      "keyword_tag": ["灰度上线", "流量切分", "A/B测试"],
+      "difficulty": "高级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你的算法上线有没有做灰度、A/B测试？流量如何划分？如何判定是否全量上线？"
+    },
+    {
+      "id": "0027",
+      "dimension": "数据结构",
+      "keyword_tag": ["模型轻量化", "剪枝量化", "LoRA", "QLoRA"],
+      "difficulty": "高级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "针对大模型微调，你为什么选择LoRA/QLoRA而非全参数微调？两者在资源消耗、微调效果、部署成本上有什么差异？"
+    },
+    {
+      "id": "0028",
+      "dimension": "算法设计",
+      "keyword_tag": ["基线模型", "迭代思路", "消融实验", "Transformer"],
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你的项目选用Transformer而非CNN/LSTM的原因是什么？不同模型架构在你的场景下的优劣势如何对比？"
+    },
+    {
+      "id": "0029",
+      "dimension": "算法设计",
+      "keyword_tag": ["HuggingFace", "Transformers", "预训练模型"],
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你为什么选用HuggingFace Transformers加载预训练模型，而不是手动复现或用其他框架？生态和效率上的优势体现在哪里？"
+    },
+    {
+      "id": "0030",
+      "dimension": "工程实践与运维",
+      "keyword_tag": ["Weights & Biases", "MLflow", "实验管理"],
+      "difficulty": "低级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你的实验管理选用W&B而非MLflow的依据是什么？两款工具在日志记录、可视化、复现性上有什么区别？"
+    },
+    {
+      "id": "0031",
+      "dimension": "编程语言核心",
+      "keyword_tag": ["Python", "C++", "高性能推理"],
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你的推理服务为什么用Python开发而非C++？什么场景下你会考虑切换为C++做高性能优化？"
+    },
+    {
+      "id": "0032",
+      "dimension": "算法设计",
+      "keyword_tag": ["OpenCV", "Librosa", "多模态处理"],
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "针对视觉/语音任务，你为什么选用OpenCV/Librosa而非其他处理库？在数据预处理效率和兼容性上有哪些优势？"
+    },
+    {
+      "id": "0033",
+      "dimension": "数据库与缓存",
+      "keyword_tag": ["数据治理", "脏数据清洗", "异常过滤"],
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "在你的数据项目中，脏数据、缺失值、异常值是如何识别、清洗、过滤和修复的？"
+    },
+    {
+      "id": "0034",
+      "dimension": "数据结构",
+      "keyword_tag": ["数据建模", "分层设计", "数仓分层"],
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你做过的数据仓库是如何分层建模的？ODS、DWD、DWS、ADS每层职责是什么？"
+    },
+    {
+      "id": "0035",
+      "dimension": "计算机基础",
+      "keyword_tag": ["ETL流程", "数据链路", "断点续传"],
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你的ETL数据流转完整链路是什么？遇到链路中断，如何做到断点续跑、不重复计算？"
+    },
+    {
+      "id": "0036",
+      "dimension": "工程实践与运维",
+      "keyword_tag": ["Spark", "计算性能", "资源倾斜", "任务调优"],
+      "difficulty": "高级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你的数据计算任务执行很慢，你会从算子、shuffle、分区、倾斜四个角度如何优化？"
+    },
+    {
+      "id": "0037",
+      "dimension": "数据库与缓存",
+      "keyword_tag": ["Flink", "实时计算", "流处理", "窗口机制"],
+      "difficulty": "高级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你用过哪些实时计算引擎？窗口、水印、乱序数据分别是如何处理的？"
+    },
+    {
+      "id": "0038",
+      "dimension": "编程语言核心",
+      "keyword_tag": ["SQL", "UDF函数", "自定义逻辑", "PySpark"],
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你的数据项目中有没有开发自定义UDF/UDTF？实现逻辑和性能考量是什么？"
+    },
+    {
+      "id": "0039",
+      "dimension": "数据结构",
+      "keyword_tag": ["维度建模", "事实表", "维度表", "星型模型"],
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "说说你项目中的事实表与维度表设计，粒度如何定义，如何避免数据膨胀？"
+    },
+    {
+      "id": "0040",
+      "dimension": "工程实践与运维",
+      "keyword_tag": ["数据质量监控", "校验规则", "告警机制"],
+      "difficulty": "高级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你的数据项目如何做数据质量监控？配置了哪些校验规则、阈值和告警方式？"
+    },
+    {
+      "id": "0041",
+      "dimension": "算法设计",
+      "keyword_tag": ["数据血缘", "链路追溯", "依赖管理"],
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你是如何管理数据血缘和任务依赖的？上游变更如何防止下游雪崩？"
+    },
+    {
+      "id": "0042",
+      "dimension": "计算机基础",
+      "keyword_tag": ["存储选型", "冷热分层", "成本优化", "Hive"],
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你的项目如何做存储选型与冷热分层？如何平衡查询速度与存储成本？"
+    },
+    {
+      "id": "0043",
+      "dimension": "算法设计",
+      "keyword_tag": ["离线统计", "指标口径", "逻辑一致性"],
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你的项目中核心业务指标口径如何定义？如何保证离线和实时口径一致？"
+    },
+    {
+      "id": "0044",
+      "dimension": "数据结构",
+      "keyword_tag": ["并行处理", "分区策略", "并发度控制"],
+      "difficulty": "高级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你在大数据任务中如何设计分区和并发度？如何避免小文件过多问题？"
+    },
+    {
+      "id": "0045",
+      "dimension": "数据库与缓存",
+      "keyword_tag": ["批量写入", "幂等性", "重复容忍"],
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你的项目在批量写入数据库时，如何保证幂等、避免重复落库？"
+    },
+    {
+      "id": "0046",
+      "dimension": "编程语言核心",
+      "keyword_tag": ["Spark", "Flink", "批流处理"],
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你为什么选用Spark而非Flink做批处理/流处理任务？两者在时延、吞吐量、使用成本上的差异如何取舍？"
+    },
+    {
+      "id": "0047",
+      "dimension": "数据库与缓存",
+      "keyword_tag": ["Hive", "Iceberg", "Hudi", "数据湖"],
+      "difficulty": "高级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你的数据存储选用Hive/Iceberg/Hudi的原因是什么？三款数据湖/数仓组件在更新效率、查询性能上有什么区别？"
+    },
+    {
+      "id": "0048",
+      "dimension": "工程实践与运维",
+      "keyword_tag": ["Airflow", "DolphinScheduler", "任务调度"],
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你为什么选用Airflow而非DolphinScheduler做任务调度？在依赖配置、可视化、容错能力上有哪些差异？"
+    }
+  ]
+}

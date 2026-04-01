@@ -57,6 +57,18 @@ target/
 *.log
 logs/
 
+### Node.js / Vue / Frontend ###
+node_modules/
+dist/
+dist-ssr/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.env.local
+.env.*.local
+
 ### Audio / Temp Files ###
 temp_*.wav
 temp_*.mp3
