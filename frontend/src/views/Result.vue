@@ -1,278 +1,1 @@
-<template>
-  <div class="result-container">
-    <div class="result-header">
-      <h2>面试评估报告</h2>
-      <button class="btn-back" @click="goHome">返回首页</button>
-    </div>
-
-    <div v-if="loading" class="loading">正在生成评估报告...</div>
-
-    <div v-else-if="error" class="error-state">
-      <p>{{ error }}</p>
-      <button @click="fetchResult">重试</button>
-    </div>
-
-    <div v-else class="report-content">
-      <!-- Overview Section -->
-      <div v-if="evaluation.overview" class="section overview-section">
-        <h3>综合评分</h3>
-        <div class="score-card">
-          <div class="score">{{ evaluation.score || 'N/A' }}</div>
-          <div class="grade">{{ evaluation.grade || '待定' }}</div>
-        </div>
-        <p class="summary">{{ evaluation.summary }}</p>
-      </div>
-
-      <!-- Detail Section -->
-      <div class="section detail-section">
-        <h3>详细点评</h3>
-        <div class="markdown-body" v-html="formattedEvaluation"></div>
-      </div>
-
-      <!-- Q&A Review -->
-      <div class="section qa-section">
-        <h3>问答回顾</h3>
-        <div
-          v-for="(q, index) in questions"
-          :key="q.id"
-          class="qa-item"
-        >
-          <div class="question">
-            <span class="badgem">Q{{ index + 1 }}</span>
-            {{ q.question }}
-          </div>
-          <div class="answer">
-            <span class="badgea">A</span>
-            {{ answers[index] || '未作答' }}
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
-<script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import axios from 'axios'
-
-const router = useRouter()
-const route = useRoute()
-const loading = ref(true)
-const error = ref('')
-const resultData = ref(null)
-
-const evaluation = computed(() => {
-  if (!resultData.value) return {}
-  // Parser logic if needed, or use fields from JSON
-  return {
-    score: resultData.value.score, // if available
-    grade: resultData.value.level,
-    summary: resultData.value.summary // if available
-  }
-})
-
-const questions = computed(() => resultData.value?.questions || [])
-const answers = computed(() => resultData.value?.answers || [])
-
-const formattedEvaluation = computed(() => {
-  if (!resultData.value?.evaluation?.realtime_evaluation) return ''
-  let text = resultData.value.evaluation.realtime_evaluation
-
-  // Headers
-  text = text.replace(/^####\s+(.*$)/gm, '<h4 class="md-h4">$1</h4>')
-  text = text.replace(/^###\s+(.*$)/gm, '<h3 class="md-h3">$1</h3>')
-  text = text.replace(/^##\s+(.*$)/gm, '<h2 class="md-h2">$1</h2>')
-  text = text.replace(/^#\s+(.*$)/gm, '<h1 class="md-h1">$1</h1>')
-
-  // Bold (**text**)
-  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-
-  // Lists
-  text = text.replace(/^\s*-\s+(.*$)/gm, '<li class="md-li">$1</li>')
-  text = text.replace(/^\s*\d+\.\s+(.*$)/gm, '<div class="md-list-item"><span class="list-num"></span> $1</div>')
-
-  // Newlines:
-  // 1. First, temporarily replace headers/lists to avoid messing them up with <br>
-  // Actually, simpler: replace \n with <br>, but try to avoid double <br> after block elements
-  // Let's just do safe replacement
-  text = text.replace(/\n/g, '<br>')
-
-  return text
-})
-
-onMounted(() => {
-  fetchResult()
-})
-
-const fetchResult = async () => {
-  loading.value = true
-  error.value = ''
-  try {
-    const sessionId = route.query.sessionId
-    if (!sessionId) throw new Error('无效的会话 ID')
-
-    // Fetch result
-    const res = await axios.get(`/api/interview/result`, {
-      params: { sessionId }
-    })
-
-    if (res.data.success) {
-      resultData.value = res.data
-    } else {
-      error.value = res.data.message || '获取结果失败'
-    }
-  } catch (err) {
-    console.error('Fetch result failed', err)
-    error.value = '无法加载评估结果，请稍后重试'
-  } finally {
-    loading.value = false
-  }
-}
-
-const goHome = () => {
-  router.push('/profile')
-}
-</script>
-
-<style scoped>
-.result-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-family: 'Segoe UI', sans-serif;
-}
-
-.result-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 1rem;
-}
-
-.btn-back {
-  padding: 0.5rem 1rem;
-  border: 1px solid #ddd;
-  background: white;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.loading, .error-state {
-  text-align: center;
-  margin-top: 3rem;
-  color: #666;
-}
-
-.section {
-  background: white;
-  border-radius: 8px;
-  padding: 2rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-}
-
-h3 {
-  margin-top: 0;
-  color: #333;
-  border-left: 4px solid #667eea;
-  padding-left: 10px;
-}
-
-.score-card {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.score {
-  font-size: 3rem;
-  font-weight: bold;
-  color: #667eea;
-}
-
-.grade {
-  font-size: 1.5rem;
-  background: #f0f2f5;
-  padding: 0.2rem 1rem;
-  border-radius: 20px;
-  color: #555;
-}
-
-.markdown-body {
-  line-height: 1.8;
-  color: #444;
-}
-
-.md-h1, .md-h2, .md-h3 {
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-  color: #333;
-  font-weight: 600;
-}
-
-.md-h3 {
-  font-size: 1.1rem;
-}
-
-.md-h4 {
-  font-size: 1.05rem;
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-  color: #555;
-  font-weight: 600;
-}
-
-.md-li {
-  margin-left: 1.5rem;
-  margin-bottom: 0.25rem;
-  list-style-type: disc;
-}
-
-.qa-item {
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid #f9f9f9;
-  padding-bottom: 1rem;
-}
-
-.question, .answer {
-  margin-bottom: 0.5rem;
-  position: relative;
-  padding-left: 2rem;
-}
-
-.badgem, .badgea {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  text-align: center;
-  line-height: 24px;
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.badgem {
-  background: #e6f7ff;
-  color: #1890ff;
-}
-
-.badgea {
-  background: #f6ffed;
-  color: #52c41a;
-}
-
-.question {
-  font-weight: 600;
-  color: #333;
-}
-
-.answer {
-  color: #666;
-}
-</style>
+<template>  <div class="result-container">    <div class="result-header">      <h2>面试评估报告</h2>      <button class="btn-back" @click="goHome">返回首页</button>    </div>    <div v-if="loading" class="loading-state full-page-loader">      <div class="spinner">        <div class="bounce1"></div>        <div class="bounce2"></div>        <div class="bounce3"></div>      </div>      <p class="loading-text">评估官正在为您生成深度评测报告，请耐心等待...</p>    </div>    <div v-else-if="error" class="error-state">      <p>{{ error }}</p>      <button @click="fetchResult">重试</button>    </div>    <div v-else class="report-content">      <!-- Grade Section -->      <div class="section grade-section">        <h3>综合等级</h3>        <div class="score-card">          <div class="grade">            <template v-if="evaluation.grade !== '待定' && ['S', 'A', 'B', 'C', 'D'].includes(evaluation.grade)">              <img :src="`/${evaluation.grade}.png`" :alt="evaluation.grade" class="grade-image" />            </template>            <template v-else>              {{ evaluation.grade }}            </template>          </div>        </div>      </div>      <!-- Radar Charts Section -->      <div v-if="showCharts" class="section charts-section">        <h3>能力评估雷达图</h3>        <div class="charts-container">          <div class="chart-box">            <h4>专业技术模块</h4>            <Radar :data="techChartData" :options="chartOptions" />          </div>          <div class="chart-box">            <h4>核心软素质模块</h4>            <Radar :data="softChartData" :options="chartOptions" />          </div>        </div>      </div>      <!-- Detail Section -->      <div class="section detail-section">        <h3>面试评估报告</h3>        <div class="markdown-body" v-html="formattedReport"></div>      </div>      <div class="section detail-section">        <h3>培养方案</h3>        <div class="markdown-body" v-html="formattedTraining"></div>      </div>      <!-- Q&A Review -->      <div class="section qa-section">        <h3>问答回顾</h3>        <div          v-for="(item, index) in dialogHistory"          :key="index"          class="qa-item"        >          <div v-if="index % 2 === 0" class="question">            <span class="badgem">Q</span>            {{ item }}          </div>          <div v-else class="answer">            <span class="badgea">A</span>            {{ item }}          </div>        </div>      </div>    </div>  </div></template><script setup>import { ref, computed, onMounted } from 'vue'import { useRouter, useRoute } from 'vue-router'import {  Chart as ChartJS,  RadialLinearScale,  PointElement,  LineElement,  Filler,  Tooltip,  Legend} from 'chart.js'import { Radar } from 'vue-chartjs'ChartJS.register(  RadialLinearScale,  PointElement,  LineElement,  Filler,  Tooltip,  Legend)const router = useRouter()const route = useRoute()const loading = ref(true)const error = ref('')const resultData = ref(null)const evaluation = computed(() => {  if (!resultData.value) return {}  let grade = '待定'  if (resultData.value.report) {    const match = resultData.value.report.match(/竞争力等级[^A-Za-z]*([SABCD]?)/i)    if (match && match[1]) {      grade = match[1].toUpperCase()    }  }  return {    score: 'N/A',    grade: grade,    summary: '面试已完成'  }})const dialogHistory = computed(() => resultData.value?.history || [])// 提取雷达图数据const showCharts = ref(false)const techChartData = ref({  labels: [],  datasets: [{    label: '专业技术得分',    backgroundColor: 'rgba(54, 162, 235, 0.2)',    borderColor: 'rgba(54, 162, 235, 1)',    pointBackgroundColor: 'rgba(54, 162, 235, 1)',    pointBorderColor: '#fff',    pointHoverBackgroundColor: '#fff',    pointHoverBorderColor: 'rgba(54, 162, 235, 1)',    data: []  }]})const softChartData = ref({  labels: [],  datasets: [{    label: '核心软素质得分',    backgroundColor: 'rgba(255, 99, 132, 0.2)',    borderColor: 'rgba(255, 99, 132, 1)',    pointBackgroundColor: 'rgba(255, 99, 132, 1)',    pointBorderColor: '#fff',    pointHoverBackgroundColor: '#fff',    pointHoverBorderColor: 'rgba(255, 99, 132, 1)',    data: []  }]})const chartOptions = {  responsive: true,  maintainAspectRatio: false,  scales: {    r: {      angleLines: {        display: true      },      suggestedMin: 0,      suggestedMax: 10    }  }}const parseScores = (report) => {  if (!report) return  const techKeywords = ['数据结构', '算法设计', '计算机基础', '编程语言核心', '数据库与缓存', '工程实践与运维']  const softKeywords = ['问题解决能力', '沟通与团队协作能力', '抗压能力', '时间管理能力', '自主学习能力', '自我认知与职业规划能力']  const parsedTech = {}  const parsedSoft = {}  // 另一种处理方式是使用报告中文本的自然段  const lines = report.split('\n')  for (let line of lines) {    const scoreMatch = line.match(/(?:\*\*|\*|- )?([^\n:：\*]+?)(?:\*\*|\*)?[:：]\s*(\d+(?:\.\d+)?)(?:分|\/10)?/);    if (scoreMatch) {      let label = scoreMatch[1].trim()      let score = parseFloat(scoreMatch[2])      // 清理前导符合和空白      label = label.replace(/^-\s*/, '').replace(/^\d+\.\s*/, '').replace(/\*/g, '').trim()      const matchedTech = techKeywords.find(k => label.includes(k))      const matchedSoft = softKeywords.find(k => label.includes(k))      if (matchedTech && score <= 10) {        parsedTech[matchedTech] = score      } else if (matchedSoft && score <= 10) {        parsedSoft[matchedSoft] = score      }    }  }  const tLabels = []  const tScores = []  techKeywords.forEach(k => {    if (parsedTech[k] !== undefined) {      tLabels.push(k)      tScores.push(parsedTech[k])    }  })  const sLabels = []  const sScores = []  softKeywords.forEach(k => {    if (parsedSoft[k] !== undefined) {      sLabels.push(k)      sScores.push(parsedSoft[k])    }  })  if (tLabels.length > 0 || sLabels.length > 0) {    if (tLabels.length > 0) {      techChartData.value.labels = tLabels      techChartData.value.datasets[0].data = tScores    }    if (sLabels.length > 0) {      softChartData.value.labels = sLabels      softChartData.value.datasets[0].data = sScores    }    showCharts.value = true  }}const formatMarkdown = (text) => {  if (!text) return ''  let formatted = text  formatted = formatted.replace(/^####\s+(.*$)/gm, '<h4 class="md-h4">$1</h4>')  formatted = formatted.replace(/^###\s+(.*$)/gm, '<h3 class="md-h3">$1</h3>')  formatted = formatted.replace(/^##\s+(.*$)/gm, '<h2 class="md-h2">$1</h2>')  formatted = formatted.replace(/^#\s+(.*$)/gm, '<h1 class="md-h1">$1</h1>')  formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  formatted = formatted.replace(/^\s*-\s+(.*$)/gm, '<li class="md-li">$1</li>')  formatted = formatted.replace(/^\s*\d+\.\s+(.*$)/gm, '<div class="md-list-item"><span class="list-num"></span> $1</div>')  formatted = formatted.replace(/\n/g, '<br>')  return formatted}const formattedReport = computed(() => {  return formatMarkdown(resultData.value?.report)})const formattedTraining = computed(() => {  return formatMarkdown(resultData.value?.training_program)})onMounted(() => {  loading.value = true  try {    const reportData = sessionStorage.getItem('evaluationReport')    if (reportData) {      resultData.value = JSON.parse(reportData)      parseScores(resultData.value.report)    } else {      error.value = '未找到评估报告，请重新面试。'    }  } catch (err) {    error.value = '解析报告失败'  } finally {    loading.value = false  }})const goHome = () => {  router.push('/profile')}</script><style scoped>.result-container {  max-width: 900px;  margin: 0 auto;  padding: 2rem;  font-family: 'Segoe UI', sans-serif;}.result-header {  display: flex;  justify-content: space-between;  align-items: center;  margin-bottom: 2rem;  border-bottom: 1px solid #eee;  padding-bottom: 1rem;}.btn-back {  padding: 0.5rem 1rem;  border: 1px solid #ddd;  background: white;  border-radius: 4px;  cursor: pointer;}.loading, .error-state {  text-align: center;  margin-top: 3rem;  color: #666;}.spinner {  margin: 0 auto 20px;  width: 70px;  text-align: center;}.spinner > div {  width: 18px;  height: 18px;  background-color: #667eea;  border-radius: 100%;  display: inline-block;  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;  animation: sk-bouncedelay 1.4s infinite ease-in-out both;  margin: 0 4px;}.spinner .bounce1 {  -webkit-animation-delay: -0.32s;  animation-delay: -0.32s;}.spinner .bounce2 {  -webkit-animation-delay: -0.16s;  animation-delay: -0.16s;}@-webkit-keyframes sk-bouncedelay {  0%, 80%, 100% { -webkit-transform: scale(0) }  40% { -webkit-transform: scale(1.0) }}@keyframes sk-bouncedelay {  0%, 80%, 100% {    -webkit-transform: scale(0);    transform: scale(0);  } 40% {    -webkit-transform: scale(1.0);    transform: scale(1.0);  }}.loading-state.full-page-loader {  display: flex;  flex-direction: column;  justify-content: center;  align-items: center;  height: 50vh;  width: 100%;}.loading-text {  font-size: 1.1rem;  color: #667eea;  font-weight: 500;  text-align: center;  animation: pulse-text 1.5s infinite;}@keyframes pulse-text {  0% { opacity: 0.6; }  50% { opacity: 1; }  100% { opacity: 0.6; }}.section {  background: white;  border-radius: 8px;  padding: 2rem;  margin-bottom: 2rem;  box-shadow: 0 2px 12px rgba(0,0,0,0.05);}h3 {  margin-top: 0;  color: #333;  border-left: 4px solid #667eea;  padding-left: 10px;}.score-card {  display: flex;  align-items: center;  justify-content: center;  gap: 1rem;  margin-bottom: 1rem;}.score {  font-size: 3rem;  font-weight: bold;  color: #667eea;}.grade {  display: flex;  align-items: center;  justify-content: center;  font-size: 1.5rem;  background: #f0f2f5;  padding: 1rem 2rem;  border-radius: 20px;  color: #555;  min-width: 150px;}.grade-image {  height: 100px;  vertical-align: middle;}.charts-section {  padding: 2rem;}.charts-container {  display: flex;  flex-wrap: wrap;  gap: 2rem;  justify-content: center;  margin-top: 1rem;}.chart-box {  flex: 1;  min-width: 300px;  max-width: 400px;  height: 350px;  background: #fafafa;  border-radius: 8px;  padding: 1rem;  display: flex;  flex-direction: column;  align-items: center;}.chart-box h4 {  margin-top: 0;  margin-bottom: 1rem;  color: #555;  font-size: 1.1rem;}.markdown-body {  line-height: 1.8;  color: #444;}.md-h1, .md-h2, .md-h3 {  margin-top: 1.5rem;  margin-bottom: 0.5rem;  color: #333;  font-weight: 600;}.md-h3 {  font-size: 1.1rem;}.md-h4 {  font-size: 1.05rem;  margin-top: 1rem;  margin-bottom: 0.5rem;  color: #555;  font-weight: 600;}.md-li {  margin-left: 1.5rem;  margin-bottom: 0.25rem;  list-style-type: disc;}.qa-item {  margin-bottom: 1.5rem;  border-bottom: 1px solid #f9f9f9;  padding-bottom: 1rem;}.question, .answer {  margin-bottom: 0.5rem;  position: relative;  padding-left: 2rem;}.badgem, .badgea {  position: absolute;  left: 0;  top: 0;  width: 24px;  height: 24px;  border-radius: 4px;  text-align: center;  line-height: 24px;  font-size: 0.8rem;  font-weight: bold;}.badgem {  background: #e6f7ff;  color: #1890ff;}.badgea {  background: #f6ffed;  color: #52c41a;}.question {  font-weight: 600;  color: #333;}.answer {  color: #666;}</style>

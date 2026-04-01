@@ -1,536 +1,1 @@
-<template>
-  <div class="interview-voice-container">
-    <div class="header">
-      <div class="progress-info">
-        <span>当前进度: {{ currentIndex + 1 }} / {{ questions.length }}</span>
-        <div class="progress-bar">
-          <div class="progress" :style="{ width: ((currentIndex + 1) / questions.length) * 100 + '%' }"></div>
-        </div>
-      </div>
-      <button class="btn-submit-all" @click="submitAll">提交所有回答</button>
-    </div>
-
-    <div class="main-content">
-      <div v-if="currentQuestion" class="question-card">
-        <div class="voice-header">
-          <h3 class="question-title">第 {{ currentIndex + 1 }} 题</h3>
-        </div>
-
-        <!-- Context Area -->
-        <div v-if="parsedContent.context" class="q-context">
-          {{ parsedContent.context }}
-        </div>
-
-        <!-- Sub Questions Area -->
-        <div class="answer-section">
-          <div v-for="(subQ, idx) in parsedContent.subs" :key="idx" class="sub-q-item">
-            <div class="sub-q-label">
-              {{ parsedContent.subs.length > 1 ? `问题 ${idx + 1}: ` : '' }}{{ subQ }}
-            </div>
-
-            <!-- Voice Controls for this sub-question -->
-            <div class="voice-controls-inline">
-              <button
-                class="btn-record-sm"
-                :class="{ recording: recordingIndex === idx }"
-                @mousedown="startRecording(idx)"
-                @mouseup="stopRecording(idx)"
-                @touchstart.prevent="startRecording(idx)"
-                @touchend.prevent="stopRecording(idx)"
-              >
-                <span v-if="recordingIndex === idx" class="icon-pulse">🔴</span>
-                <span v-else>🎤</span>
-              </button>
-
-              <div class="status-inline">
-                <span v-if="recordingIndex === idx">正在录音...</span>
-                <span v-else-if="processingIndex === idx">正在识别...</span>
-                <span v-else>按住说话</span>
-              </div>
-            </div>
-
-            <textarea
-              v-model="currentSubAnswers[idx]"
-              class="transcribed-text"
-              :placeholder="`语音识别结果将显示在这里 (${idx+1})...`"
-              @input="syncAnswer"
-              rows="4"
-            ></textarea>
-          </div>
-        </div>
-
-        <div class="navigation">
-          <button
-            class="btn-nav btn-prev"
-            :disabled="currentIndex === 0"
-            @click="prevQuestion"
-          >
-            上一题
-          </button>
-          <button
-            v-if="currentIndex < questions.length - 1"
-            class="btn-nav btn-next"
-            @click="nextQuestion"
-          >
-            下一题
-          </button>
-          <button
-            v-else
-            class="btn-nav btn-finish"
-            @click="submitAll"
-          >
-            完成面试
-          </button>
-        </div>
-      </div>
-      <div v-else class="loading">加载题目中...</div>
-    </div>
-  </div>
-</template>
-
-<script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import axios from 'axios'
-
-const router = useRouter()
-const route = useRoute()
-const questions = ref([])
-const answers = ref([])
-const currentIndex = ref(0)
-const questionStates = ref({})
-
-// Recording state
-const recordingIndex = ref(-1) // -1 means none
-const processingIndex = ref(-1)
-
-// Audio Context State
-let audioContext = null
-let audioSource = null
-let audioProcessor = null
-let audioLeftChannel = []
-let audioRecordingLength = 0
-let audioSampleRate = 44100
-
-const currentQuestion = computed(() => questions.value[currentIndex.value])
-
-const parsedContent = computed(() => {
-  if (!currentQuestion.value) return { context: '', subs: [] }
-  return getParsedState(currentIndex.value).parsed
-})
-
-const currentSubAnswers = computed(() => {
-  return getParsedState(currentIndex.value).subAnswers
-})
-
-// JSP-style Parser
-const parseQuestionContent = (content) => {
-  if (!content) return { context: "", subs: [] };
-  if (!content.includes("\n") || !/-\s/.test(content)) {
-       return { context: "", subs: [content] };
-  }
-  const lines = content.split('\n');
-  let contextLines = [];
-  let subs = [];
-  let foundFirstBullet = false;
-  lines.forEach(line => {
-      const trimmed = line.trim();
-      if (trimmed.startsWith("-")) {
-          foundFirstBullet = true;
-          let clean = trimmed.replace(/^-\s*(追问\d*[：:]?)?\s*/, '');
-          subs.push(clean);
-      } else {
-          if (!foundFirstBullet) {
-              contextLines.push(line);
-          } else {
-              if (subs.length > 0) subs[subs.length - 1] += "\n" + line;
-              else contextLines.push(line);
-          }
-      }
-  });
-  return {
-      context: contextLines.join('\n').trim(),
-      subs: subs.length > 0 ? subs : [content]
-  };
-}
-
-const getParsedState = (index) => {
-  if (!questionStates.value[index]) {
-    const q = questions.value[index]
-    const parsed = parseQuestionContent(q.question || q.content)
-    let initialSubs = new Array(parsed.subs.length).fill('')
-    if (answers.value[index]) {
-       initialSubs[0] = answers.value[index]
-    }
-    questionStates.value[index] = {
-      parsed: parsed,
-      subAnswers: initialSubs
-    }
-  }
-  return questionStates.value[index]
-}
-
-const syncAnswer = () => {
-  const state = getParsedState(currentIndex.value)
-  answers.value[currentIndex.value] = state.subAnswers.join('\n\n')
-}
-
-onMounted(() => {
-  const storedQuestions = sessionStorage.getItem('interviewQuestions')
-  if (storedQuestions) {
-    questions.value = JSON.parse(storedQuestions)
-    answers.value = new Array(questions.value.length).fill('')
-  } else {
-    alert('未找到题目')
-    router.push('/config')
-  }
-})
-
-// === WAV Helpers ===
-const writeString = (view, offset, string) => {
-  for (let i = 0; i < string.length; i++) {
-    view.setUint8(offset + i, string.charCodeAt(i))
-  }
-}
-
-const floatTo16BitPCM = (output, offset, input) => {
-  for (let i = 0; i < input.length; i++, offset += 2) {
-    let s = Math.max(-1, Math.min(1, input[i]))
-    output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true)
-  }
-}
-
-const encodeWAV = (samples, sampleRate) => {
-  const buffer = new ArrayBuffer(44 + samples.length * 2)
-  const view = new DataView(buffer)
-  writeString(view, 0, 'RIFF')
-  view.setUint32(4, 36 + samples.length * 2, true)
-  writeString(view, 8, 'WAVE')
-  writeString(view, 12, 'fmt ')
-  view.setUint32(16, 16, true)
-  view.setUint16(20, 1, true)
-  view.setUint16(22, 1, true)
-  view.setUint32(24, sampleRate, true)
-  view.setUint32(28, sampleRate * 2, true)
-  view.setUint16(32, 2, true)
-  view.setUint16(34, 16, true)
-  writeString(view, 36, 'data')
-  view.setUint32(40, samples.length * 2, true)
-  floatTo16BitPCM(view, 44, samples)
-  return new Blob([view.buffer], { type: 'audio/wav' })
-}
-
-const mergeBuffers = (channelBuffer, recordingLength) => {
-  const result = new Float32Array(recordingLength)
-  let offset = 0
-  for (let i = 0; i < channelBuffer.length; i++) {
-    const buffer = channelBuffer[i]
-    result.set(buffer, offset)
-    offset += buffer.length
-  }
-  return result
-}
-
-const startRecording = async (subIndex) => {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-
-    audioContext = new (window.AudioContext || window.webkitAudioContext)()
-    audioSampleRate = audioContext.sampleRate
-    audioSource = audioContext.createMediaStreamSource(stream)
-    audioProcessor = audioContext.createScriptProcessor(4096, 1, 1)
-
-    audioLeftChannel = []
-    audioRecordingLength = 0
-
-    audioProcessor.onaudioprocess = (e) => {
-      if (recordingIndex.value !== subIndex) return
-      const inputBuffer = e.inputBuffer.getChannelData(0)
-      const bufferData = new Float32Array(inputBuffer)
-      audioLeftChannel.push(bufferData)
-      audioRecordingLength += bufferData.length
-    }
-
-    audioSource.connect(audioProcessor)
-    audioProcessor.connect(audioContext.destination)
-
-    recordingIndex.value = subIndex
-  } catch (err) {
-    console.error('Mic error', err)
-    alert('无法访问麦克风')
-  }
-}
-
-const stopRecording = (subIndex) => {
-  if (recordingIndex.value === subIndex) {
-    recordingIndex.value = -1
-    processingIndex.value = subIndex
-
-    // Cleanup audio context
-    if (audioSource) {
-       audioSource.mediaStream.getTracks().forEach(track => track.stop());
-       audioSource.disconnect()
-    }
-    if (audioProcessor) {
-      audioProcessor.disconnect()
-      audioProcessor.onaudioprocess = null
-    }
-
-    if (audioRecordingLength > 0) {
-        const pcmBuffer = mergeBuffers(audioLeftChannel, audioRecordingLength)
-        const audioBlob = encodeWAV(pcmBuffer, audioSampleRate)
-        processAudio(audioBlob, subIndex)
-    } else {
-        processingIndex.value = -1
-    }
-  }
-}
-
-const processAudio = async (audioBlob, subIndex) => {
-  const formData = new FormData()
-  const filename = `audio_${route.query.sessionId}_${currentIndex.value}_${subIndex}.wav`
-  formData.append('audio_file', audioBlob, filename)
-  formData.append('language', 'zh')
-
-  try {
-    const res = await axios.post('/api/analyze-interview', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
-    })
-
-    if (res.data.code === 200 && res.data.data) {
-      const text = res.data.data.candidate_text
-      const state = getParsedState(currentIndex.value)
-      // Append text
-      const current = state.subAnswers[subIndex] || ''
-      state.subAnswers[subIndex] = current + (current ? ' ' : '') + text
-      syncAnswer()
-    } else {
-      alert('识别失败: ' + (res.data.msg || '未知错误'))
-    }
-  } catch (err) {
-    console.error('Upload failed', err)
-    alert('识别请求失败')
-  } finally {
-    processingIndex.value = -1
-  }
-}
-
-const prevQuestion = () => {
-  if (currentIndex.value > 0) currentIndex.value--
-}
-
-const nextQuestion = () => {
-  if (currentIndex.value < questions.value.length - 1) currentIndex.value++
-}
-
-const submitAll = async () => {
-  if (!confirm('确定提交所有回答吗？')) return
-
-  try {
-    const sessionId = route.query.sessionId
-    const payload = {
-      sessionId: sessionId,
-      answers: answers.value.map((ans, idx) => ({
-        questionId: questions.value[idx].id,
-        answer: ans
-      }))
-    }
-    const res = await axios.post('/api/interview/submit', payload)
-    if (res.data.success || res.status === 200) {
-      router.push({ path: '/result', query: { sessionId } })
-    }
-  } catch (err) {
-    console.error('Submit failed', err)
-    alert('提交失败')
-  }
-}
-</script>
-
-<style scoped>
-.interview-voice-container {
-  min-height: 100vh;
-  background: #f0f2f5;
-  display: flex;
-  flex-direction: column;
-}
-
-.header {
-  background: white;
-  padding: 1rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.progress-info {
-  flex: 1;
-  max-width: 400px;
-}
-
-.progress-bar {
-  height: 8px;
-  background: #e9ecef;
-  border-radius: 4px;
-  overflow: hidden;
-  margin-top: 5px;
-}
-
-.progress {
-  height: 100%;
-  background: #667eea;
-  transition: width 0.3s ease;
-}
-
-.btn-submit-all {
-  padding: 0.5rem 1rem;
-  background: #ff4d4f;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.main-content {
-  flex: 1;
-  padding: 2rem;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-
-.question-card {
-  background: white;
-  width: 100%;
-  max-width: 800px; /* Wider for voice layout */
-  padding: 2.5rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-
-.voice-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid #f0f0f0;
-  padding-bottom: 1rem;
-}
-
-.question-title {
-  color: #667eea;
-  margin: 0;
-}
-
-.q-context {
-  margin-bottom: 2rem;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  color: #333;
-  padding: 1.2rem;
-  background: #f9f9f9;
-  border-radius: 8px;
-  border-left: 4px solid #667eea;
-}
-
-.answer-section {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.sub-q-item {
-  border: 1px solid #eee;
-  padding: 1.5rem;
-  border-radius: 8px;
-}
-
-.sub-q-label {
-  font-weight: 600;
-  color: #444;
-  margin-bottom: 1rem;
-  font-size: 1rem;
-}
-
-.voice-controls-inline {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.btn-record-sm {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: white;
-  border: 2px solid #ddd;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 1.2rem;
-  transition: all 0.2s;
-}
-
-.btn-record-sm:active, .btn-record-sm.recording {
-  border-color: #ff4d4f;
-  background: #fff1f0;
-}
-
-.icon-pulse {
-  animation: pulse 1s infinite;
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.2); opacity: 0.8; }
-  100% { transform: scale(1); opacity: 1; }
-}
-
-.status-inline {
-  color: #888;
-  font-size: 0.9rem;
-}
-
-.transcribed-text {
-  width: 100%;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  resize: vertical;
-  background: #fafafa;
-  font-family: inherit;
-}
-
-.navigation {
-  margin-top: 2rem;
-  display: flex;
-  justify-content: space-between;
-}
-
-.btn-nav {
-  padding: 0.75rem 2rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  cursor: pointer;
-}
-
-.btn-prev {
-  background: white;
-  border: 1px solid #ddd;
-  color: #666;
-}
-
-.btn-next {
-  background: #667eea;
-  color: white;
-  border: none;
-}
-
-.btn-finish {
-  background: #52c41a;
-  color: white;
-  border: none;
-}
-</style>
+<template>  <div class="interview-container">    <div class="sidebar">      <h3>面试进度 (语音模式)</h3>      <div v-if="loading" class="sidebar-text">正在初始化面试...</div>      <div v-else class="sidebar-text">        <p><strong>当前阶段：</strong> {{ isFinished ? '面试完成' : (isIntro ? '自我介绍' : '技术面试') }}</p>        <p v-if="!isIntro && !isFinished"><strong>已答大题：</strong> {{ mainQuestionCount }} / 12</p>        <p v-if="!isIntro && !isFinished"><strong>当前追问：</strong> {{ followUpCount }} 次</p>      </div>      <button class="btn-submit-all" v-if="isFinished" @click="submitAll">查看评估报告</button>    </div>    <div class="main-content">      <div class="question-card" v-if="!loading">        <div class="card-header">          <div class="header-left">            <span class="question-number">{{ isFinished ? '结束' : '当前问题' }}</span>            <span class="question-type">{{ isIntro ? '暖场' : '简答题' }}</span>          </div>        </div>        <div class="question-body" style="position: relative;">          <!-- 提交换壳时的加载动画 -->          <div v-if="submitting" class="submitting-overlay">            <div class="spinner">              <div class="bounce1"></div>              <div class="bounce2"></div>              <div class="bounce3"></div>            </div>            <p class="loading-text">面试官正在思考下一步...</p>          </div>          <div class="q-context" v-if="currentQuestionText">            {{ currentQuestionText }}          </div>          <div class="q-context" v-if="isFinished">            面试已全部结束，请点击左侧“查看评估报告”。          </div>          <div class="sub-q-item" v-if="!isFinished">            <div class="voice-controls">              <button                  :class="['btn-record', isRecording ? 'recording' : '']"                  @mousedown="startRecording"                  @mouseup="stopRecording"              >                {{ isRecording ? '松开结束' : '按住说话' }}              </button>              <div v-if="isRecording" class="recording-indicator">🎤 正在录音...</div>            </div>            <textarea                v-model="currentAnswer"                class="sub-answer-box"                placeholder="语音识别结果(可手动修改)..."                rows="6"            ></textarea>          </div>        </div>        <div class="card-footer" v-if="!isFinished">          <button              type="button"              class="btn-nav btn-next"              @click="submitAnswer"              :disabled="submitting || currentAnswer.trim().length === 0"          >            {{ submitting ? '提交中...' : '提交回答' }}          </button>        </div>      </div>      <div v-else class="loading-state full-page-loader">        <div class="spinner">          <div class="bounce1"></div>          <div class="bounce2"></div>          <div class="bounce3"></div>        </div>        <p class="loading-text">{{ loadingText }}</p>      </div>    </div>  </div></template><script setup>import { ref, onMounted } from 'vue'import { useRouter } from 'vue-router'import axios from 'axios'const router = useRouter()const sessionId = ref('')const loading = ref(true)const loadingText = ref('正在初始化面试...这可能需要一些时间...')const submitting = ref(false)const currentQuestionText = ref('')const currentAnswer = ref('')const isIntro = ref(true)const isFinished = ref(false)const mainQuestionCount = ref(0)const followUpCount = ref(0)const isRecording = ref(false)let mediaRecorder = nulllet audioChunks = []onMounted(async () => {  try {    const resumeText = sessionStorage.getItem('resumeText') || 'AI算法工程师简历'    const postPosition = sessionStorage.getItem('interviewDirection') || 'AI算法工程师'    // 关键修复：去掉多余 /api，避免变成 /api/api/...    const res = await axios.post('/api/fastapi/interview/interactive/init', {      post_position: postPosition,      resume_text: resumeText    })    if (res.data.status === 'success') {      sessionId.value = res.data.session_id      currentQuestionText.value = res.data.message      isIntro.value = true    } else {      alert('初始化失败：' + (res.data.message || '未知错误'))    }  } catch (err) {    console.error(err)    alert('网络错误，请确保FastAPI已启动')  } finally {    loading.value = false  }})const startRecording = async () => {  try {    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })    mediaRecorder = new MediaRecorder(stream)    audioChunks = []    mediaRecorder.ondataavailable = (e) => {      audioChunks.push(e.data)    }    mediaRecorder.onstop = async () => {      const rawBlob = new Blob(audioChunks)      try {        const wavBlob = await convertToWav(rawBlob)        await processAudio(wavBlob)      } catch (err) {        console.error('Wav conversion failed:', err)        // 如果转换失败，退级为直接提交        const fallbackBlob = new Blob(audioChunks, { type: 'audio/wav' })        await processAudio(fallbackBlob)      }    }    mediaRecorder.start()    isRecording.value = true  } catch (e) {    console.error(e)    alert('无法访问麦克风')  }}const stopRecording = () => {  if (mediaRecorder && isRecording.value) {    mediaRecorder.stop()    isRecording.value = false    mediaRecorder.stream.getTracks().forEach((t) => t.stop())  }}// 在前端将录音（可能为 webm 编码）转换为标准的 RIFF WAV，这样后端不需要 ffmpegconst convertToWav = async (blob) => {  const arrayBuffer = await blob.arrayBuffer()  const audioContext = new (window.AudioContext || window.webkitAudioContext)()  const audioBuffer = await audioContext.decodeAudioData(arrayBuffer)  const numOfChan = audioBuffer.numberOfChannels  const sampleRate = audioBuffer.sampleRate  const format = 1 // PCM  const bitDepth = 16  let result  if (numOfChan === 2) {    const left = audioBuffer.getChannelData(0)    const right = audioBuffer.getChannelData(1)    const length = left.length + right.length    result = new Float32Array(length)    let inputIndex = 0    for (let index = 0; index < length;) {      result[index++] = left[inputIndex]      result[index++] = right[inputIndex]      inputIndex++    }  } else {    result = audioBuffer.getChannelData(0)  }  const buffer = new ArrayBuffer(44 + result.length * 2)  const view = new DataView(buffer)  const writeString = (v, offset, str) => {    for (let i = 0; i < str.length; i++) {      v.setUint8(offset + i, str.charCodeAt(i))    }  }  writeString(view, 0, 'RIFF')  view.setUint32(4, 36 + result.length * 2, true)  writeString(view, 8, 'WAVE')  writeString(view, 12, 'fmt ')  view.setUint32(16, 16, true)  view.setUint16(20, format, true)  view.setUint16(22, numOfChan, true)  view.setUint32(24, sampleRate, true)  view.setUint32(28, sampleRate * numOfChan * 2, true)  view.setUint16(32, numOfChan * 2, true)  view.setUint16(34, bitDepth, true)  writeString(view, 36, 'data')  view.setUint32(40, result.length * 2, true)  let offset = 44  for (let i = 0; i < result.length; i++, offset += 2) {    let s = Math.max(-1, Math.min(1, result[i]))    view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true)  }  return new Blob([view], { type: 'audio/wav' })}const processAudio = async (blob) => {  const formData = new FormData()  formData.append('audio_file', blob, 'audio.wav')  try {    currentAnswer.value = '正在识别语音...'    const res = await axios.post('/api/analyze-interview', formData, {      headers: { 'Content-Type': 'multipart/form-data' }    })    if (res.data.code === 200) {      currentAnswer.value = res.data?.data?.candidate_text || ''    } else {      currentAnswer.value = '识别失败'    }  } catch (e) {    console.error(e)    currentAnswer.value = '识别异常'  }}const submitAnswer = async () => {  if (!currentAnswer.value.trim()) return  submitting.value = true  try {    const res = await axios.post('/api/fastapi/interview/interactive/submit', {      session_id: sessionId.value,      answer: currentAnswer.value    })    if (res.data.status === 'success') {      currentAnswer.value = ''      if (res.data.is_finished) {        isFinished.value = true        currentQuestionText.value = ''      } else {        currentQuestionText.value = res.data.message        isIntro.value = false        if ((currentQuestionText.value || '').includes('道题:')) {          mainQuestionCount.value++          followUpCount.value = 0        } else if ((currentQuestionText.value || '').includes('追问')) {          followUpCount.value++        }      }    } else {      alert('提交失败：' + (res.data.message || '未知错误'))    }  } catch (e) {    console.error(e)    alert('提交异常')  } finally {    submitting.value = false  }}const submitAll = async () => {  loadingText.value = '正在生成评估报告，请耐心等待...'  loading.value = true  try {    const res = await axios.post('/api/fastapi/interview/interactive/evaluate', {      session_id: sessionId.value    })    if (res.data.status === 'success') {      sessionStorage.setItem('evaluationReport', JSON.stringify(res.data.data || {}))      router.push({ path: '/result', query: { sessionId: sessionId.value } })    } else {      alert('评估失败：' + (res.data.message || '未知错误'))      loading.value = false    }  } catch (e) {    console.error(e)    alert('评估异常')    loading.value = false  }}</script><style scoped>.interview-container {  display: flex;  height: 100vh;  background-color: #f7f9fc;}.sidebar {  width: 280px;  background: white;  border-right: 1px solid #e0e0e0;  display: flex;  flex-direction: column;  padding: 1.5rem;}.sidebar h3 {  margin-top: 0;  margin-bottom: 1.5rem;  font-size: 1.2rem;  color: #333;}.btn-submit-all {  margin-top: auto;  padding: 0.75rem;  background: #ff4d4f;  color: white;  border: none;  border-radius: 6px;  font-weight: 600;  cursor: pointer;  width: 100%;}.sidebar-text {  font-size: 1rem;  color: #555;  line-height: 1.8;}.main-content {  flex: 1;  padding: 2rem;  overflow-y: auto;  display: flex;  justify-content: center;}.question-card {  background: white;  padding: 2.5rem;  border-radius: 12px;  box-shadow: 0 4px 12px rgba(0,0,0,0.05);  width: 100%;  max-width: 800px;  display: flex;  flex-direction: column;  min-height: 500px;}.card-header {  margin-bottom: 1.5rem;  border-bottom: 1px solid #f0f0f0;  padding-bottom: 1rem;}.question-number {  font-size: 1.1rem;  font-weight: bold;  color: #667eea;  margin-right: 0.8rem;}.question-type {  background: #f0f2f5;  color: #666;  padding: 4px 12px;  border-radius: 12px;  font-size: 0.85rem;}.q-context {  margin-bottom: 1.5rem;  font-size: 1.05rem;  line-height: 1.6;  color: #333;  padding: 15px;  background: #f9f9f9;  border-radius: 6px;  border-left: 4px solid #667eea;  white-space: pre-wrap;}.sub-answer-box {  width: 100%;  padding: 1rem;  border: 1px solid #ddd;  border-radius: 8px;  font-size: 1rem;  resize: vertical;  min-height: 140px;}.card-footer {  margin-top: auto;  padding-top: 2rem;  display: flex;  justify-content: flex-end;}.btn-nav {  padding: 0.6rem 1.5rem;  border-radius: 6px;  cursor: pointer;  font-size: 1rem;  font-weight: 500;  border: none;}.btn-next {  background: #667eea;  color: white;}.voice-controls {  display: flex;  align-items: center;  gap: 15px;  margin-bottom: 10px;}.btn-record {  background: #52c41a;  color: white;  border: none;  padding: 10px 20px;  border-radius: 20px;  cursor: pointer;  font-size: 1.05rem;}.btn-record.recording {  background: #ff4d4f;  animation: pulse 1.5s infinite;}@keyframes pulse {  0% { transform: scale(1); }  50% { transform: scale(1.05); }  100% { transform: scale(1); }}.submitting-overlay {  position: absolute;  top: 0;  left: 0;  right: 0;  bottom: 0;  background: rgba(255, 255, 255, 0.85);  display: flex;  flex-direction: column;  justify-content: center;  align-items: center;  z-index: 10;  border-radius: 8px;}.spinner {  margin: 0 auto 20px;  width: 70px;  text-align: center;}.spinner > div {  width: 18px;  height: 18px;  background-color: #667eea;  border-radius: 100%;  display: inline-block;  -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;  animation: sk-bouncedelay 1.4s infinite ease-in-out both;  margin: 0 4px;}.spinner .bounce1 {  -webkit-animation-delay: -0.32s;  animation-delay: -0.32s;}.spinner .bounce2 {  -webkit-animation-delay: -0.16s;  animation-delay: -0.16s;}@-webkit-keyframes sk-bouncedelay {  0%, 80%, 100% { -webkit-transform: scale(0) }  40% { -webkit-transform: scale(1.0) }}@keyframes sk-bouncedelay {  0%, 80%, 100% {    -webkit-transform: scale(0);    transform: scale(0);  } 40% {    -webkit-transform: scale(1.0);    transform: scale(1.0);  }}.loading-state.full-page-loader {  display: flex;  flex-direction: column;  justify-content: center;  align-items: center;  height: 100%;  width: 100%;}.loading-text {  font-size: 1.1rem;  color: #667eea;  font-weight: 500;  text-align: center;  animation: pulse-text 1.5s infinite;}@keyframes pulse-text {  0% { opacity: 0.6; }  50% { opacity: 1; }  100% { opacity: 0.6; }}.loading-state {  display: flex;  justify-content: center;  align-items: center;  color: #888;}</style>
