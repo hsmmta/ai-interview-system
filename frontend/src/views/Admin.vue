@@ -7,6 +7,7 @@
     <div class="content">
       <div class="toolbar">
         <button class="btn-primary" @click="showAddModal = true">添加节点</button>
+        <button class="btn-danger" style="width: auto; margin-left: 10px;" @click="showDeleteModal = true">删除节点</button>
       </div>
 
       <div class="graph-view">
@@ -43,6 +44,7 @@
       </div>
     </div>
 
+    <!-- 添加节点弹窗 -->
     <div v-if="showAddModal" class="modal-overlay">
       <div class="modal">
         <h3>添加/导入节点</h3>
@@ -61,7 +63,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label>节点内容</label>
+            <label>节点内容</label> jie
             <textarea v-model="manualNode.name" rows="2" placeholder="输入名称或题目内容"></textarea>
           </div>
           <div class="form-group">
@@ -89,6 +91,32 @@
         </div>
       </div>
     </div>
+
+    <!-- 删除节点弹窗 -->
+    <div v-if="showDeleteModal" class="modal-overlay">
+      <div class="modal">
+        <h3>删除知识图谱节点</h3>
+        <p class="hint" style="color: #ff4d4f; margin-bottom: 20px; font-weight: bold;">
+          注意：删除上级节点将联动删除其下属所有的子节点及连线！
+        </p>
+        <div class="form-group">
+          <label>节点类型</label>
+          <select v-model="deleteNodeData.type">
+            <option value="Job">职业岗位 (Job) - 将连带删除所属 Tech 和 Question</option>
+            <option value="Tech">知识点 (Tech) - 将连带删除所属 Question</option>
+            <option value="Question">面试问题 (Question) - 仅删除该问题</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>要删除的节点名称 / 题干</label>
+          <input v-model="deleteNodeData.name" type="text" placeholder="输入准确的节点名称" />
+        </div>
+        <div class="modal-actions">
+          <button class="btn-cancel" @click="showDeleteModal = false">取消</button>
+          <button class="btn-danger" style="width: auto;" @click="executeBatchDelete">确认彻底删除</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -101,12 +129,18 @@ import { DataSet } from 'vis-data'
 
 const router = useRouter()
 const showAddModal = ref(false)
+const showDeleteModal = ref(false)
 const addMode = ref('manual')
 
 const manualNode = ref({
   name: '',
   type: 'Tech',
   parentName: ''
+})
+
+const deleteNodeData = ref({
+  name: '',
+  type: 'Job'
 })
 
 const jsonInput = ref('')
@@ -393,6 +427,61 @@ const addNode = async () => {
     await session.close()
   }
 }
+
+const executeBatchDelete = async () => {
+  const { name, type } = deleteNodeData.value
+  if (!name.trim()) return alert('请输入要删除的节点名称')
+
+  if (!confirm(`确定要彻底删除 [${type}] "${name}" 及其所有子级关系吗？该操作不可恢复！`)) {
+    return
+  }
+
+  if (!driver) {
+    alert('数据库未连接')
+    return
+  }
+
+  const session = driver.session()
+  try {
+    let query = ''
+    if (type === 'Job') {
+      // 删除 Job 以及挂载在它下面的 Tech 和 Question
+      query = `
+        MATCH (j:Job {name: $name})
+        OPTIONAL MATCH (j)<-[:REQUIRE]-(t:Tech)
+        OPTIONAL MATCH (t)<-[:TESTS]-(q:Question)
+        DETACH DELETE j, t, q
+      `
+    } else if (type === 'Tech') {
+      // 删除 Tech 以及挂载在它下面的 Question
+      query = `
+        MATCH (t:Tech {name: $name})
+        OPTIONAL MATCH (t)<-[:TESTS]-(q:Question)
+        DETACH DELETE t, q
+      `
+    } else if (type === 'Question') {
+      // 仅删除单一 Question
+      query = `
+        MATCH (q:Question {name: $name})
+        DETACH DELETE q
+      `
+    }
+
+    const res = await session.run(query, { name: name.trim() })
+    alert(`节点及其子结构已成功删除！`)
+
+    showDeleteModal.value = false
+    deleteNodeData.value = { name: '', type: 'Job' }
+    selectedNode.value = null // 清空侧边栏选中状态
+
+    await loadGraphData()
+  } catch (err) {
+    console.error('删除节点失败:', err)
+    alert('删除失败: ' + err.message)
+  } finally {
+    await session.close()
+  }
+}
 </script>
 
 <style scoped>
@@ -619,5 +708,21 @@ const addNode = async () => {
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.btn-danger {
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  width: 100%;
+  transition: background 0.3s;
+}
+
+.btn-danger:hover {
+  background: #ff7875;
 }
 </style>
