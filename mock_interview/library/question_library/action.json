@@ -1,389 +1,389 @@
-{
-  "action": [
-    {
-      "id": "0001",
-      "dimension": "问题解决能力",
-      "difficulty": "低级",
-      "applicable_post": ["通用"],
-      "content": "请分享一个你过往遇到的真实且难度较大的挑战，当时是什么情况？你采取了哪些行动？最终结果和收获是什么？"
-    },
-    {
-      "id": "0002",
-      "dimension": "抗压能力",
-      "difficulty": "低级",
-      "applicable_post": ["通用"],
-      "content": "请讲述一次你在高压、紧急截止时间下完成任务的真实经历，你是如何调整心态并稳步推进的？"
-    },
-    {
-      "id": "0003",
-      "dimension": "抗压能力",
-      "difficulty": "低级",
-      "applicable_post": ["通用"],
-      "content": "分享一次你投入大量精力，但最终效果没有达到预期的经历，你是如何面对失败并做出调整的？"
-    },
-    {
-      "id": "0004",
-      "dimension": "时间管理能力",
-      "difficulty": "低级",
-      "applicable_post": ["通用"],
-      "content": "当学习和项目中同时出现多个紧急任务、无法兼顾的时候，你是如何排序处理的？请举一个真实例子。"
-    },
-    {
-      "id": "0005",
-      "dimension": "沟通与团队协作能力",
-      "difficulty": "低级",
-      "applicable_post": ["通用"],
-      "content": "请讲述一次你和团队成员意见完全不一致的真实经历，你是如何沟通并推动达成共识的？"
-    },
-    {
-      "id": "0006",
-      "dimension": "沟通与团队协作能力",
-      "difficulty": "中级",
-      "applicable_post": ["通用"],
-      "content": "分享一次跨角色、跨团队协作完成任务的经历，你遇到了哪些沟通障碍？最后是如何解决的？"
-    },
-    {
-      "id": "0007",
-      "dimension": "沟通与团队协作能力",
-      "difficulty": "中级",
-      "applicable_post": ["通用"],
-      "content": "你有没有说服导师或者团队采纳你方案的经历？你是如何表达观点、争取支持的？"
-    },
-    {
-      "id": "0008",
-      "dimension": "沟通与团队协作能力",
-      "difficulty": "中级",
-      "applicable_post": ["通用"],
-      "content": "当你需要向非技术人员解释复杂问题的时候，你一般会怎么做？请举一个真实例子。"
-    },
-    {
-      "id": "0009",
-      "dimension": "沟通与团队协作能力",
-      "difficulty": "中级",
-      "applicable_post": ["通用"],
-      "content": "在项目中遇到配合度较低的队友，你是如何处理协作关系、保障整体进度的？"
-    },
-    {
-      "id": "0010",
-      "dimension": "自主学习能力",
-      "difficulty": "低级",
-      "applicable_post": ["通用"],
-      "content": "过去一年内，你主动学习的一项技能是什么？为什么想学？你是如何坚持并掌握的？"
-    },
-    {
-      "id": "0011",
-      "dimension": "自主学习能力",
-      "difficulty": "低级",
-      "applicable_post": ["通用"],
-      "content": "分享一次你主动发现自身短板、并针对性补强的经历，最后你收获了什么？"
-    },
-    {
-      "id": "0012",
-      "dimension": "自主学习能力",
-      "difficulty": "中级",
-      "applicable_post": ["通用"],
-      "content": "讲述你印象最深的一次工作或学习失误，你从中总结出了哪些可复用的经验？"
-    },
-    {
-      "id": "0013",
-      "dimension": "自主学习能力",
-      "difficulty": "中级",
-      "applicable_post": ["通用"],
-      "content": "面对完全陌生的知识领域，你的学习方法是什么？请举一个真实案例说明。"
-    },
-    {
-      "id": "0014",
-      "dimension": "自我认知与职业规划能力",
-      "difficulty": "低级",
-      "applicable_post": ["通用"],
-      "content": "分享一次你主动承担额外工作、而非被动接受任务的经历，你为什么愿意这样做？"
-    },
-    {
-      "id": "0015",
-      "dimension": "问题解决能力",
-      "difficulty": "中级",
-      "applicable_post": ["通用"],
-      "content": "当项目出现问题，但并不是你的直接责任的时候，你一般会怎么处理？请举真实例子。"
-    },
-    {
-      "id": "0016",
-      "dimension": "自主学习能力",
-      "difficulty": "中级",
-      "applicable_post": ["通用"],
-      "content": "你有没有主动优化原有流程、提升效率的经历？你做了哪些尝试？最终效果如何？"
-    },
-    {
-      "id": "0017",
-      "dimension": "沟通与团队协作能力",
-      "difficulty": "中级",
-      "applicable_post": ["通用"],
-      "content": "项目遇到突发情况、人手紧张的时候，你是如何配合团队一起渡过难关的？"
-    },
-    {
-      "id": "0018",
-      "dimension": "自我认知与职业规划能力",
-      "difficulty": "低级",
-      "applicable_post": ["通用"],
-      "content": "结合你的经历，说说你选择这个岗位的核心原因，以及你最匹配该岗位的特质是什么？"
-    },
-    {
-      "id": "0019",
-      "dimension": "自我认知与职业规划能力",
-      "difficulty": "低级",
-      "applicable_post": ["通用"],
-      "content": "你认为自己最大的优点和需要改进的地方分别是什么？请用真实经历举例说明。"
-    },
-    {
-      "id": "0020",
-      "dimension": "自我认知与职业规划能力",
-      "difficulty": "低级",
-      "applicable_post": ["通用"],
-      "content": "你是如何设定自己的职业目标的？这个岗位能够如何帮助你实现长期规划？"
-    },
-    {
-      "id": "0021",
-      "dimension": "问题解决能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "分享一次模型训练不收敛、效果不达预期的真实经历，你是如何定位问题并调整方案的？"
-    },
-    {
-      "id": "0022",
-      "dimension": "问题解决能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "讲述你遇到数据质量差、标注不准的项目经历，你是如何推进算法迭代的？"
-    },
-    {
-      "id": "0023",
-      "dimension": "问题解决能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "你有没有算法方案被推翻重来的经历？你是如何调整心态、重新设计思路的？"
-    },
-    {
-      "id": "0024",
-      "dimension": "沟通与团队协作能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "在算法或比赛项目中与队友需求不一致的时候，你是如何沟通、对齐目标的？"
-    },
-    {
-      "id": "0025",
-      "dimension": "沟通与团队协作能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "面对不切实际的算法效果预期，你是如何沟通、平衡理想与落地可行性的？"
-    },
-    {
-      "id": "0026",
-      "dimension": "沟通与团队协作能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "你会如何向不懂算法的人讲清你的模型逻辑与落地价值？请结合真实经历说明。"
-    },
-    {
-      "id": "0027",
-      "dimension": "自主学习能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "AI技术迭代很快，你是如何持续跟进新模型、新框架的？请举一个真实例子。"
-    },
-    {
-      "id": "0028",
-      "dimension": "自主学习能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "讲述你从零学习并落地一个新算法或新框架的经历，遇到了哪些难点？你是如何解决的？"
-    },
-    {
-      "id": "0029",
-      "dimension": "问题解决能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "遇到离线效果很好、线上推理效果却明显下滑的情况，你是如何排查、复盘并优化的？"
-    },
-    {
-      "id": "0030",
-      "dimension": "问题解决能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "分享你从算法设计到上线落地全程负责的项目，过程中有哪些关键卡点？你是如何解决的？"
-    },
-    {
-      "id": "0031",
-      "dimension": "抗压能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "模型上线后出现延迟过高、精度骤降等突发问题，你是如何快速响应并处理的？"
-    },
-    {
-      "id": "0032",
-      "dimension": "自主学习能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "你有没有主动优化已有模型、降低算力成本或提升效果的经历？你具体做了哪些工作？"
-    },
-    {
-      "id": "0033",
-      "dimension": "自我认知与职业规划能力",
-      "difficulty": "低级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "结合你的经历，说说你为什么选择AI算法方向，而不是其他开发岗位？"
-    },
-    {
-      "id": "0034",
-      "dimension": "自我认知与职业规划能力",
-      "difficulty": "低级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "你最有成就感的算法项目是什么？你在其中承担了什么样的角色？"
-    },
-    {
-      "id": "0035",
-      "dimension": "自我认知与职业规划能力",
-      "difficulty": "低级",
-      "applicable_post": ["AI算法工程师"],
-      "content": "你认为AI算法工程师最核心的软素质是什么？请结合自身情况说明匹配度。"
-    },
-    {
-      "id": "0036",
-      "dimension": "自主学习能力",
-      "difficulty": "低级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "分享你主动学习大数据或AI相关新技术的经历，你是如何获取资源并落地掌握的？"
-    },
-    {
-      "id": "0037",
-      "dimension": "沟通与团队协作能力",
-      "difficulty": "低级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "讲述数据项目中和队友意见不一致的经历，你是如何沟通对齐、推进落地的？"
-    },
-    {
-      "id": "0038",
-      "dimension": "抗压能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "临近截止时间，数据处理模块仍然存在bug，你是如何调整心态并快速解决的？"
-    },
-    {
-      "id": "0039",
-      "dimension": "时间管理能力",
-      "difficulty": "低级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "同时兼顾毕设、课程和大数据项目的时候，你是如何分配时间、保障进度的？"
-    },
-    {
-      "id": "0040",
-      "dimension": "问题解决能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "分享你在数据项目中遇到的棘手问题，你是如何一步步定位、处理并最终解决的？"
-    },
-    {
-      "id": "0041",
-      "dimension": "自我认知与职业规划能力",
-      "difficulty": "低级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "结合你的数据项目经历，说说你最擅长、以及最需要补强的能力分别是什么？"
-    },
-    {
-      "id": "0042",
-      "dimension": "自主学习能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "面对陌生的大数据组件，例如 Flink、Hadoop，你是如何快速上手并完成实操的？"
-    },
-    {
-      "id": "0043",
-      "dimension": "沟通与团队协作能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "你是如何向非技术同学讲清楚复杂的数据处理逻辑和最终业务价值的？"
-    },
-    {
-      "id": "0044",
-      "dimension": "抗压能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "你的数据治理方案多次被驳回，你是如何调整心态、复盘并优化迭代的？"
-    },
-    {
-      "id": "0045",
-      "dimension": "时间管理能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "ETL任务繁琐且耗时较长，你是如何拆分任务、把控每个阶段进度的？"
-    },
-    {
-      "id": "0046",
-      "dimension": "问题解决能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "项目中出现大量缺失数据、脏数据的时候，你是如何清洗处理、保障最终数据质量的？"
-    },
-    {
-      "id": "0047",
-      "dimension": "自我认知与职业规划能力",
-      "difficulty": "低级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "你为什么选择AI数据开发方向？未来一到两年，你的能力提升计划是什么？"
-    },
-    {
-      "id": "0048",
-      "dimension": "自主学习能力",
-      "difficulty": "低级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "你有没有做过数据相关的复盘笔记或者技术分享？你的学习沉淀方式是什么？"
-    },
-    {
-      "id": "0049",
-      "dimension": "沟通与团队协作能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "队友进度滞后、影响整体交付的时候，你是如何沟通配合、推进项目的？"
-    },
-    {
-      "id": "0050",
-      "dimension": "抗压能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "比赛中大数据平台突发故障、无法正常计算，你是如何应急处理、降低损失的？"
-    },
-    {
-      "id": "0051",
-      "dimension": "时间管理能力",
-      "difficulty": "低级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "你是如何平衡专业课学习和大数据项目实操，避免两者顾此失彼的？"
-    },
-    {
-      "id": "0052",
-      "dimension": "问题解决能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "当数据计算结果严重偏离预期的时候，你是如何逐层排查、并最终修正逻辑的？"
-    },
-    {
-      "id": "0053",
-      "dimension": "自我认知与职业规划能力",
-      "difficulty": "低级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "你认为AI数据开发岗位最关键的特质是什么？你自身的匹配程度如何？"
-    },
-    {
-      "id": "0054",
-      "dimension": "沟通与团队协作能力",
-      "difficulty": "低级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "在导师指导的数据项目中，你是如何高效沟通需求、及时反馈问题和进度的？"
-    },
-    {
-      "id": "0055",
-      "dimension": "自主学习能力",
-      "difficulty": "中级",
-      "applicable_post": ["AI数据开发工程师"],
-      "content": "你是如何跟踪大数据加AI的技术趋势的？请举一个你调研过的新技术案例。"
-    }
-  ]
+{
+  "action": [
+    {
+      "id": "0001",
+      "dimension": "问题解决能力",
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "请分享一个你过往遇到的真实且难度较大的挑战，当时是什么情况？你采取了哪些行动？最终结果和收获是什么？"
+    },
+    {
+      "id": "0002",
+      "dimension": "抗压能力",
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "请讲述一次你在高压、紧急截止时间下完成任务的真实经历，你是如何调整心态并稳步推进的？"
+    },
+    {
+      "id": "0003",
+      "dimension": "抗压能力",
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "分享一次你投入大量精力，但最终效果没有达到预期的经历，你是如何面对失败并做出调整的？"
+    },
+    {
+      "id": "0004",
+      "dimension": "时间管理能力",
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "当学习和项目中同时出现多个紧急任务、无法兼顾的时候，你是如何排序处理的？请举一个真实例子。"
+    },
+    {
+      "id": "0005",
+      "dimension": "沟通与团队协作能力",
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "请讲述一次你和团队成员意见完全不一致的真实经历，你是如何沟通并推动达成共识的？"
+    },
+    {
+      "id": "0006",
+      "dimension": "沟通与团队协作能力",
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "分享一次跨角色、跨团队协作完成任务的经历，你遇到了哪些沟通障碍？最后是如何解决的？"
+    },
+    {
+      "id": "0007",
+      "dimension": "沟通与团队协作能力",
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "你有没有说服导师或者团队采纳你方案的经历？你是如何表达观点、争取支持的？"
+    },
+    {
+      "id": "0008",
+      "dimension": "沟通与团队协作能力",
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "当你需要向非技术人员解释复杂问题的时候，你一般会怎么做？请举一个真实例子。"
+    },
+    {
+      "id": "0009",
+      "dimension": "沟通与团队协作能力",
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "在项目中遇到配合度较低的队友，你是如何处理协作关系、保障整体进度的？"
+    },
+    {
+      "id": "0010",
+      "dimension": "自主学习能力",
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "过去一年内，你主动学习的一项技能是什么？为什么想学？你是如何坚持并掌握的？"
+    },
+    {
+      "id": "0011",
+      "dimension": "自主学习能力",
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "分享一次你主动发现自身短板、并针对性补强的经历，最后你收获了什么？"
+    },
+    {
+      "id": "0012",
+      "dimension": "自主学习能力",
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "讲述你印象最深的一次工作或学习失误，你从中总结出了哪些可复用的经验？"
+    },
+    {
+      "id": "0013",
+      "dimension": "自主学习能力",
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "面对完全陌生的知识领域，你的学习方法是什么？请举一个真实案例说明。"
+    },
+    {
+      "id": "0014",
+      "dimension": "自我认知与职业规划能力",
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "分享一次你主动承担额外工作、而非被动接受任务的经历，你为什么愿意这样做？"
+    },
+    {
+      "id": "0015",
+      "dimension": "问题解决能力",
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "当项目出现问题，但并不是你的直接责任的时候，你一般会怎么处理？请举真实例子。"
+    },
+    {
+      "id": "0016",
+      "dimension": "自主学习能力",
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "你有没有主动优化原有流程、提升效率的经历？你做了哪些尝试？最终效果如何？"
+    },
+    {
+      "id": "0017",
+      "dimension": "沟通与团队协作能力",
+      "difficulty": "中级",
+      "applicable_post": ["通用"],
+      "content": "项目遇到突发情况、人手紧张的时候，你是如何配合团队一起渡过难关的？"
+    },
+    {
+      "id": "0018",
+      "dimension": "自我认知与职业规划能力",
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "结合你的经历，说说你选择这个岗位的核心原因，以及你最匹配该岗位的特质是什么？"
+    },
+    {
+      "id": "0019",
+      "dimension": "自我认知与职业规划能力",
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "你认为自己最大的优点和需要改进的地方分别是什么？请用真实经历举例说明。"
+    },
+    {
+      "id": "0020",
+      "dimension": "自我认知与职业规划能力",
+      "difficulty": "低级",
+      "applicable_post": ["通用"],
+      "content": "你是如何设定自己的职业目标的？这个岗位能够如何帮助你实现长期规划？"
+    },
+    {
+      "id": "0021",
+      "dimension": "问题解决能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "分享一次模型训练不收敛、效果不达预期的真实经历，你是如何定位问题并调整方案的？"
+    },
+    {
+      "id": "0022",
+      "dimension": "问题解决能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "讲述你遇到数据质量差、标注不准的项目经历，你是如何推进算法迭代的？"
+    },
+    {
+      "id": "0023",
+      "dimension": "问题解决能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你有没有算法方案被推翻重来的经历？你是如何调整心态、重新设计思路的？"
+    },
+    {
+      "id": "0024",
+      "dimension": "沟通与团队协作能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "在算法或比赛项目中与队友需求不一致的时候，你是如何沟通、对齐目标的？"
+    },
+    {
+      "id": "0025",
+      "dimension": "沟通与团队协作能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "面对不切实际的算法效果预期，你是如何沟通、平衡理想与落地可行性的？"
+    },
+    {
+      "id": "0026",
+      "dimension": "沟通与团队协作能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你会如何向不懂算法的人讲清你的模型逻辑与落地价值？请结合真实经历说明。"
+    },
+    {
+      "id": "0027",
+      "dimension": "自主学习能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "AI技术迭代很快，你是如何持续跟进新模型、新框架的？请举一个真实例子。"
+    },
+    {
+      "id": "0028",
+      "dimension": "自主学习能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "讲述你从零学习并落地一个新算法或新框架的经历，遇到了哪些难点？你是如何解决的？"
+    },
+    {
+      "id": "0029",
+      "dimension": "问题解决能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "遇到离线效果很好、线上推理效果却明显下滑的情况，你是如何排查、复盘并优化的？"
+    },
+    {
+      "id": "0030",
+      "dimension": "问题解决能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "分享你从算法设计到上线落地全程负责的项目，过程中有哪些关键卡点？你是如何解决的？"
+    },
+    {
+      "id": "0031",
+      "dimension": "抗压能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "模型上线后出现延迟过高、精度骤降等突发问题，你是如何快速响应并处理的？"
+    },
+    {
+      "id": "0032",
+      "dimension": "自主学习能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你有没有主动优化已有模型、降低算力成本或提升效果的经历？你具体做了哪些工作？"
+    },
+    {
+      "id": "0033",
+      "dimension": "自我认知与职业规划能力",
+      "difficulty": "低级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "结合你的经历，说说你为什么选择AI算法方向，而不是其他开发岗位？"
+    },
+    {
+      "id": "0034",
+      "dimension": "自我认知与职业规划能力",
+      "difficulty": "低级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你最有成就感的算法项目是什么？你在其中承担了什么样的角色？"
+    },
+    {
+      "id": "0035",
+      "dimension": "自我认知与职业规划能力",
+      "difficulty": "低级",
+      "applicable_post": ["AI算法工程师"],
+      "content": "你认为AI算法工程师最核心的软素质是什么？请结合自身情况说明匹配度。"
+    },
+    {
+      "id": "0036",
+      "dimension": "自主学习能力",
+      "difficulty": "低级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "分享你主动学习大数据或AI相关新技术的经历，你是如何获取资源并落地掌握的？"
+    },
+    {
+      "id": "0037",
+      "dimension": "沟通与团队协作能力",
+      "difficulty": "低级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "讲述数据项目中和队友意见不一致的经历，你是如何沟通对齐、推进落地的？"
+    },
+    {
+      "id": "0038",
+      "dimension": "抗压能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "临近截止时间，数据处理模块仍然存在bug，你是如何调整心态并快速解决的？"
+    },
+    {
+      "id": "0039",
+      "dimension": "时间管理能力",
+      "difficulty": "低级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "同时兼顾毕设、课程和大数据项目的时候，你是如何分配时间、保障进度的？"
+    },
+    {
+      "id": "0040",
+      "dimension": "问题解决能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "分享你在数据项目中遇到的棘手问题，你是如何一步步定位、处理并最终解决的？"
+    },
+    {
+      "id": "0041",
+      "dimension": "自我认知与职业规划能力",
+      "difficulty": "低级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "结合你的数据项目经历，说说你最擅长、以及最需要补强的能力分别是什么？"
+    },
+    {
+      "id": "0042",
+      "dimension": "自主学习能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "面对陌生的大数据组件，例如 Flink、Hadoop，你是如何快速上手并完成实操的？"
+    },
+    {
+      "id": "0043",
+      "dimension": "沟通与团队协作能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你是如何向非技术同学讲清楚复杂的数据处理逻辑和最终业务价值的？"
+    },
+    {
+      "id": "0044",
+      "dimension": "抗压能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你的数据治理方案多次被驳回，你是如何调整心态、复盘并优化迭代的？"
+    },
+    {
+      "id": "0045",
+      "dimension": "时间管理能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "ETL任务繁琐且耗时较长，你是如何拆分任务、把控每个阶段进度的？"
+    },
+    {
+      "id": "0046",
+      "dimension": "问题解决能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "项目中出现大量缺失数据、脏数据的时候，你是如何清洗处理、保障最终数据质量的？"
+    },
+    {
+      "id": "0047",
+      "dimension": "自我认知与职业规划能力",
+      "difficulty": "低级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你为什么选择AI数据开发方向？未来一到两年，你的能力提升计划是什么？"
+    },
+    {
+      "id": "0048",
+      "dimension": "自主学习能力",
+      "difficulty": "低级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你有没有做过数据相关的复盘笔记或者技术分享？你的学习沉淀方式是什么？"
+    },
+    {
+      "id": "0049",
+      "dimension": "沟通与团队协作能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "队友进度滞后、影响整体交付的时候，你是如何沟通配合、推进项目的？"
+    },
+    {
+      "id": "0050",
+      "dimension": "抗压能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "比赛中大数据平台突发故障、无法正常计算，你是如何应急处理、降低损失的？"
+    },
+    {
+      "id": "0051",
+      "dimension": "时间管理能力",
+      "difficulty": "低级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你是如何平衡专业课学习和大数据项目实操，避免两者顾此失彼的？"
+    },
+    {
+      "id": "0052",
+      "dimension": "问题解决能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "当数据计算结果严重偏离预期的时候，你是如何逐层排查、并最终修正逻辑的？"
+    },
+    {
+      "id": "0053",
+      "dimension": "自我认知与职业规划能力",
+      "difficulty": "低级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你认为AI数据开发岗位最关键的特质是什么？你自身的匹配程度如何？"
+    },
+    {
+      "id": "0054",
+      "dimension": "沟通与团队协作能力",
+      "difficulty": "低级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "在导师指导的数据项目中，你是如何高效沟通需求、及时反馈问题和进度的？"
+    },
+    {
+      "id": "0055",
+      "dimension": "自主学习能力",
+      "difficulty": "中级",
+      "applicable_post": ["AI数据开发工程师"],
+      "content": "你是如何跟踪大数据加AI的技术趋势的？请举一个你调研过的新技术案例。"
+    }
+  ]
 }

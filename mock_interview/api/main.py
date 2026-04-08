@@ -1,281 +1,311 @@
-# -*- coding: utf-8 -*-
+# api/main.py
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-import os
 import sys
-import uuid
-import json
-import importlib.util
-from typing import Dict, Any, List
+import os
+
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-CREW_FILE = os.path.join(PROJECT_ROOT, "interview_crew.py")
-if not os.path.exists(CREW_FILE):
-    raise RuntimeError(f"interview_crew.py not found: {CREW_FILE}")
-spec = importlib.util.spec_from_file_location("crew_bridge", CREW_FILE)
-crew = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(crew)
+sys.path.append(PROJECT_ROOT)
+
+import interview_crew as crew
+
+# 初始化FastAPI应用
 app = FastAPI(
-    title="AI Python",
-    description="API",
+    title="AI Python模拟面试系统",
+    description="提供Python技术面试问题生成、交互式问答、能力评估的API服务",
     version="1.0"
 )
+
+# 定义请求体模型
 class UserInfoRequest(BaseModel):
     name: str = ""
     position: str = ""
     experience: str = ""
     skills: str = ""
-    sessionId: int = 0
-    interviewType: str = ""
-    direction: str = ""
-    questionCount: int = 15
 
-class ChatInitRequest(BaseModel):
-    post_position: str
+class InteractiveInitRequest(BaseModel):
+    post_position: str = ""
     resume_text: str = ""
 
-class ChatSubmitRequest(BaseModel):
+class InteractiveSubmitRequest(BaseModel):
     session_id: str
     answer: str
 
-class ChatResponse(BaseModel):
-    status: str
+# 定义响应模型
+class BaseResponse(BaseModel):
+    status: str  # success/error
+    message: str  # 提示信息
+    data: dict = {}  # 业务数据
+    is_finished: bool = False  # 额外给submit接口用的标志
     session_id: str = ""
-    message: str = ""
-    is_finished: bool = False
-    data: dict = {}
 
-SESSION_STORE: Dict[str, Any] = {}
+# 全局内存字典，用于保持会话状态
+SESSIONS = {}
 
-def get_session(session_id: str):
-    if session_id not in SESSION_STORE:
-        raise HTTPException(status_code=404, detail="Session not found")
-    return SESSION_STORE[session_id]
-
-@app.post("/api/interview/interactive/init", response_model=ChatResponse)
-async def init_interactive(req: ChatInitRequest):
-    try:
-        from crew.interviewer import create_interviewer_agent, Flow, load_questions, filter_by_job
-
-        session_id = str(uuid.uuid4())
-
-        resume_text = req.resume_text
-        if not resume_text or len(resume_text) < 10:
-            # Fallback to local PDF if resume text not provided or too short
-            try:
-                import pdfplumber
-                pdf_path = os.path.join(PROJECT_ROOT, "测试用简历.pdf")
-                if os.path.exists(pdf_path):
-                    with pdfplumber.open(pdf_path) as pdf:
-                        resume_text = ""
-                        for page in pdf.pages:
-                            text = page.extract_text()
-                            if text:
-                                resume_text += text + "\n"
-                else:
-                    resume_text = "AI算法工程师候选人，熟练掌握基本知识"
-            except Exception as e:
-                resume_text = f"简历读取失败. {str(e)}"
-
-        agent = create_interviewer_agent(interviewee_info=resume_text, job_position=req.post_position)
-
-        # We simulate the flow steps since we can't block on input()
-        # interview_init_task1
-        result1 = agent.llm.call(f"""
-        1.从面试者简历信息{resume_text}中提取有效信息，并进行语义分割；
-        2.根据语义分割的结果严格输出json结构化信息，不要任何解释、不要markdown、不要多余文字，只返回JSON字符串
-        """)
-        import re
-        json_str = result1.strip()
-        json_str = re.sub(r'^```json', '', json_str)
-        json_str = re.sub(r'```$', '', json_str).strip()
-        try:
-            interviewee_info = json.loads(json_str)
-        except:
-            interviewee_info = {"raw": json_str}
-
-        # interview_init_task2
-        result2 = agent.llm.call(f"""
-        1.根据面试者的初步信息{interviewee_info}进行暖场，并邀请面试者做自我介绍；
-        2.如果初步信息里缺少项目经历和比赛经历以及相关技术栈，要委婉提醒面试者在自我介绍里补充相关信息；
-        3.语言要自然贴切，能够让面试者放松下来，快速进入状态。
-        """).strip()
-
-        bank1 = filter_by_job(load_questions("action.json", "action"), req.post_position)
-        bank2 = filter_by_job(load_questions("project_experience.json", "project_experience"), req.post_position)
-        bank3 = filter_by_job(load_questions("scene.json", "scene"), req.post_position)
-        bank4 = filter_by_job(load_questions("technology.json", "technology"), req.post_position)
-
-        SESSION_STORE[session_id] = {
-            "agent": agent,
-            "interviewee_info": interviewee_info,
-            "post_position": req.post_position,
-            "history": [],
-            "follow_count": 3,
-            "used_question": [3, 3, 3, 3],
-            "banks": [bank1, bank3, bank2, bank4],
-            "state": "waiting_intro", # Next expected input
-            "question_count": 0
-        }
-
-        return ChatResponse(status="success", session_id=session_id, message=result2)
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/interview/interactive/submit", response_model=ChatResponse)
-async def submit_interactive(req: ChatSubmitRequest):
-    try:
-        session = get_session(req.session_id)
-        agent = session["agent"]
-        state = session["state"]
-
-        if state == "waiting_intro":
-            # interview_init_task3
-            result = agent.llm.call(f"""
-            1.根据面试者的自我介绍{req.answer}进一步补全{session["interviewee_info"]}
-            2.严格输出json结构化信息，只返回JSON字符串
-            """).strip()
-            import re
-            json_str = result.strip()
-            json_str = re.sub(r'^```json', '', json_str)
-            json_str = re.sub(r'```$', '', json_str).strip()
-            try:
-                session["interviewee_info"] = json.loads(json_str)
-            except:
-                pass
-
-            session["state"] = "asking_question"
-            # Proceed to ask first question immediately
-            return await generate_next_question(req.session_id)
-
-        elif state == "asking_question" or state == "following_up":
-            # record answer
-            session["history"].append(req.answer)
-
-            # decide follow up
-            result = agent.llm.call(f"""
-            根据最新问题及回答{req.answer}决定是否追问。如果清晰有关键词且次数>0，返回'Y'，模糊或节奏需要换题或次数<=0则'N'。只返回Y或N。
-            当前剩余追问次数：{session['follow_count']}
-            """).strip()
-
-            if result == 'Y' and session["follow_count"] > 0:
-                session["follow_count"] -= 1
-                # interview_task5
-                follow_q = agent.llm.call(f"""
-                根据最新回答{session['history']}进行追问，结合题库或自己出题。
-                """).strip()
-                session["history"].append(follow_q)
-                session["state"] = "following_up"
-                return ChatResponse(status="success", session_id=req.session_id, message=follow_q)
-            else:
-                # Next main question
-                return await generate_next_question(req.session_id)
-        else:
-            return ChatResponse(status="error", message="Unknown state")
-
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
-
-async def generate_next_question(session_id: str):
-    session = get_session(session_id)
-    agent = session["agent"]
-    used = session["used_question"]
-
-    if not any(x > 0 for x in used):
-        session["state"] = "finished"
-        return ChatResponse(status="success", session_id=session_id, message="全部简答题回答结束", is_finished=True)
-
-    result = agent.llm.call(f"剩余题数={used} (行为,场景,项目深挖,技术)。返回其中一个不为0的类型名，只能返回'行为题'/'场景题'/'项目深挖题'/'技术题'之一。").strip()
-
-    if result == "行为题" and used[0] > 0: used[0] -= 1
-    elif result == "场景题" and used[1] > 0: used[1] -= 1
-    elif result == "项目深挖题" and used[2] > 0: used[2] -= 1
-    elif result == "技术题" and used[3] > 0: used[3] -= 1
-    else:
-        for i in range(4):
-            if used[i] > 0:
-                used[i] -= 1
-                break
-
-    chose = result
-    q = agent.llm.call(f"""
-    从{chose}题库中，结合信息{session['interviewee_info']}出一道难度适中、语义连贯的题。不许与历史{session['history']}重复。
-    """).strip()
-
-    session["history"].append(q)
-    session["follow_count"] = 3
-    session["state"] = "asking_question"
-    session["question_count"] += 1
-
-    return ChatResponse(status="success", session_id=session_id, message=f"第{session['question_count']}道题: " + q)
-
-@app.post("/api/interview/interactive/evaluate", response_model=ChatResponse)
-async def evaluate_interactive(req: dict):
-    try:
-        session_id = req.get("session_id")
-        session = get_session(session_id)
-        post_position = session["post_position"]
-        from crew.appraiser import create_evaluator_agent, create_evaluation_task
-        from crew.educator import create_mentor_agent, create_mentor_task
-        from crewai import Crew
-        from utils.kb_loader import load_knowledge
-
-        file_name = "ai_algorithm_engineer" if post_position == "AI算法工程师" else "ai_data_dev"
-        data1 = load_knowledge(file_name, "exam_point.json") or []
-        data2 = load_knowledge(file_name, "tech_stack.json") or []
-        data3 = load_knowledge("common", "tech_stack.json") or []
-        kb_full = list(data1) + list(data2) + list(data3)
-
-        evaluate_agent = create_evaluator_agent(post_position)
-        eval_task = create_evaluation_task(agent=evaluate_agent, interview_content=str(session["history"]), interviewee_info=str(session["interviewee_info"]), knowledge_base=str(kb_full), post_type=post_position)
-
-        crew1 = Crew(agents=[evaluate_agent], tasks=[eval_task])
-        report = str(crew1.kickoff())
-
-        mentor_agent = create_mentor_agent(post_position)
-        mentor_task = create_mentor_task(agent=mentor_agent, evaluation_report=report, post_type=post_position)
-        crew2 = Crew(agents=[mentor_agent], tasks=[mentor_task])
-        training_program = str(crew2.kickoff())
-
-        return ChatResponse(status="success", session_id=session_id, data={
-            "report": report,
-            "training_program": training_program,
-            "interviewee_info": session["interviewee_info"],
-            "history": session["history"]
-        })
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.post("/api/interview/generate")
+# 接口1：非交互式生成面试结果（仅供测试使用）
+@app.post("/api/interview/generate", response_model=BaseResponse)
 async def generate_interview_result(request: UserInfoRequest):
     try:
-        user_info = f"姓名：{request.name}，应聘岗位：{request.position}，工作经验：{request.experience}，技能：{request.skills}"
-        result = crew.run_interview_flow(request.position)
+        # 拼接用户信息字符串
+        user_info = f"姓名：{request.name}，应聘岗位：{request.position}，工作经验：{request.experience}，熟悉{request.skills}"
+        # 调用crew.py中的run_interview_flow函数（修复后）
+        result = crew.run_interview_flow(user_info)
+        return BaseResponse(
+            status="success",
+            message="面试结果生成成功",
+            data=result
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "error",
+                "message": f"生成失败：{str(e)}",
+                "data": {}
+            }
+        )
 
-        with open("generation_debug.log", "w", encoding="utf-8") as f:
-            f.write(f"Result: {result}\n")
 
-        return {
-            "status": "success",
-            "message": "生成结果成功",
-            "data": result,
-            "questions": crew.extract_core_questions(result.get("interview_questions", ""))
+# 接口2：交互式面试初始化（实际使用）
+@app.post("/api/interview/interactive/init", response_model=BaseResponse)
+async def init_interactive_interview(request: InteractiveInitRequest):
+    try:
+        user_info = f"应聘岗位：{request.post_position}，简历内容：{request.resume_text}"
+        # 先生成问题（调用crew.py的核心函数）
+        base_result = crew.run_interview_flow(user_info)
+        # 提取核心问题（调用crew.py的extract_core_questions函数）
+        core_questions = crew.extract_core_questions(base_result.get("interview_questions", ""))
+
+        import uuid
+        new_session_id = str(uuid.uuid4())
+
+        # 调用大模型生成开场白和暖场
+        prompt = f"你是资深面试官，面对候选人（背景：{user_info}），请给出一句亲切的暖场白，并礼貌地邀请他做个自我介绍。只要一句话，不要有多余解释。"
+        warm_up_message = crew.call_deepseek(prompt, fallback="你好，欢迎参加今天的面试，不要紧张。能先简单地做一个自我介绍吗？")
+
+        # 记录会话初始状态
+        SESSIONS[new_session_id] = {
+            "core_questions": core_questions,
+            "current_q_idx": -1,  # -1 代表还在寒暄自我介绍阶段
+            "follow_up_count": 0, # 当前追问次数
+            "history": [{"role": "interviewer", "content": warm_up_message}]
         }
+
+        return BaseResponse(
+            status="success",
+            message=warm_up_message,
+            session_id=new_session_id,
+            data={
+                "core_questions": core_questions,
+                "full_questions": base_result.get("interview_questions", "")
+            }
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "error",
+                "message": f"初始化失败：{str(e)}",
+                "data": {}
+            }
+        )
+
+
+# 新增接口：提交用户回答并获取下一题
+@app.post("/api/interview/interactive/submit", response_model=BaseResponse)
+async def submit_answer(request: InteractiveSubmitRequest):
+    try:
+        session_data = SESSIONS.get(request.session_id)
+        if not session_data:
+            raise ValueError("未找到对应的面试会话状态，请刷新重试！")
+
+        # 记录用户回答
+        session_data["history"].append({"role": "user", "content": request.answer})
+
+        # 如果是自我介绍阶段，结束自我介绍，直接进入第一大题
+        if session_data["current_q_idx"] == -1:
+            session_data["current_q_idx"] = 0
+            session_data["follow_up_count"] = 0
+
+            if len(session_data["core_questions"]) > 0:
+                next_msg = f"好的，感谢你的自我介绍！下面我们正式开始。第一道题：{session_data['core_questions'][0]}"
+            else:
+                next_msg = "好的，感谢。那么你能详述一下你的项目经历吗？"
+
+            session_data["history"].append({"role": "interviewer", "content": next_msg})
+            return BaseResponse(
+                status="success",
+                message=next_msg,
+                is_finished=False,
+                data={"current_q_idx": session_data["current_q_idx"], "follow_up_count": session_data["follow_up_count"]}
+            )
+
+        else:
+            # 如果在正常题目阶段，根据当前追问次数决定追问还是进入下一题
+            # 最多追问 3 次
+            if session_data["follow_up_count"] < 3:
+                session_data["follow_up_count"] += 1
+
+                # 动态生成追问
+                history_text = "\n".join([f"{item['role']}: {item['content']}" for item in session_data["history"][-3:]])
+                prompt = f"""
+你是面试官。针对你刚提的问题和候选人的回答进行追问（当前是第 {session_data["follow_up_count"]} 次追问）。
+对话上下文：
+{history_text}
+
+要求：
+1. 深入候选人回答的细节，提出一个具体的追问。
+2. 如果候选人回答不知道、含糊或错误，可以适当施加压力或抛出提示后再追问。
+3. 严格保持口语化，不要解释，只返回追问的话语。
+"""
+                next_msg = crew.call_deepseek(prompt, fallback="能针对这块内容的底层原理或踩过的坑，再详细说一说吗？")
+                next_msg = "[追问] " + next_msg # 为了让侧边栏状态更明显
+                session_data["history"].append({"role": "interviewer", "content": next_msg})
+                return BaseResponse(
+                    status="success",
+                    message=next_msg,
+                    is_finished=False,
+                    data={"current_q_idx": session_data["current_q_idx"], "follow_up_count": session_data["follow_up_count"]}
+                )
+
+            else:
+                # 进入下一个核心大题
+                session_data["current_q_idx"] += 1
+                session_data["follow_up_count"] = 0
+
+                if session_data["current_q_idx"] < len(session_data["core_questions"]):
+                    # 还有题目
+                    next_msg = f"好的，关于这块我们先聊到这。下一道大题：{session_data['core_questions'][session_data['current_q_idx']]}"
+                    session_data["history"].append({"role": "interviewer", "content": next_msg})
+                    return BaseResponse(
+                        status="success",
+                        message=next_msg,
+                        is_finished=False,
+                        data={"current_q_idx": session_data["current_q_idx"], "follow_up_count": session_data["follow_up_count"]}
+                    )
+                else:
+                    # 所有问题问完
+                    return BaseResponse(
+                        status="success",
+                        message="面试已全部结束，请点击左侧“进入编程测试”完成剩余环节。",
+                        is_finished=True,
+                        data={"current_q_idx": session_data["current_q_idx"], "follow_up_count": session_data["follow_up_count"]}
+                    )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "error",
+                "message": f"提交出错：{str(e)}",
+                "data": {}
+            }
+        )
+
+
+# 接口3：提交用户回答，生成实时评估
+@app.post("/api/interview/interactive/evaluate", response_model=BaseResponse)
+async def evaluate_user_answers(request: dict):
+    try:
+        session_id = request.get("session_id")
+        user_info = request.get("user_info")
+        user_answers = request.get("user_answers")
+        coding_results = request.get("coding_results", {})
+
+        formatted_history = []
+        if session_id and session_id in SESSIONS:
+            session_data = SESSIONS[session_id]
+            formatted_history = session_data.get("history", [])
+        else:
+            if not user_info or not user_answers:
+                raise ValueError("缺少 session_id 或完整的用户信息和回答数据")
+            if isinstance(user_answers, dict):
+                for k, v in user_answers.items():
+                    formatted_history.append({"role": "interviewer", "content": v.get("question", "")})
+                    formatted_history.append({"role": "user", "content": v.get("answer", "")})
+            elif isinstance(user_answers, list):
+                formatted_history = user_answers
+
+        # 将结构化的对话历史转为文本格式，以便输入给大模型
+        history_text = ""
+        for msg in formatted_history:
+            role_name = "面试官" if msg.get("role") == "interviewer" else "候选人"
+            history_text += f"{role_name}: {msg.get('content')}\n"
+
+        coding_text = ""
+        for q_id, code_ans in coding_results.items():
+            coding_text += f"编程题 {q_id} 回答:\n{code_ans}\n"
+
+        eval_prompt = f"""
+        你是资深Python技术面试官，也是岗位的综合能力评估师。
+        请基于以下信息对候选人的全程表现（包括问答和编程题）进行专业评估：
+        1. 候选人背景：{user_info}
+        2. 问答环节记录：\n{history_text}
+        3. 编程环节记录：\n{coding_text}
+
+        评估要求：
+        - 逐题点评：针对主要面试问题和编程题，点评其准确性、完整性、深度和解决思路。
+        - 整体评分：给出各能力维度（如核心软素质、专业技术等）的得分（满分10分），并给出能力竞争力评级（如S/A/B/C/D）。
+        - 改进建议：针对发现的不足（如代码风格、架构思考、基础知识盲区），给出具体可落地的短期和长期改进培养方案。
+
+        输出格式要求：
+        【评分结果】
+        核心软素质模块：
+        - 问题解决能力：X.X分
+        - 沟通与团队协作能力：X.X分
+        - 抗压能力：X.X分
+        - 时间管理能力：X.X分
+        - 自主学习能力：X.X分
+        - 自我认知与职业规划能力：X.X分
+        专业技术模块：
+        - 数据结构：X.X分
+        - 算法设计：X.X分
+        - 计算机基础：X.X分
+        - 编程语言核心：X.X分
+        - 数据库与缓存：X.X分
+        - 工程实践与运维：X.X分
+        【综合评价】
+        竞争力等级：S/A/B/C/D
+        （具体的评语）
+        【短板分析】
+        （具体的短板分析）
+        【培养方案】
+        （短期和长期的改进培养方案）
+        """
+
+        realtime_evaluation = crew.call_deepseek(
+            eval_prompt,
+            fallback="评估服务发生异常，未能返回完整的打分报告，请稍后再试或检查日志。"
+        )
+
+        return BaseResponse(
+            status="success",
+            message="实时评估生成成功",
+            data={
+                "realtime_evaluation": realtime_evaluation,
+                "history": formatted_history
+            }
+        )
     except Exception as e:
         import traceback
         traceback.print_exc()
-        with open("generation_error.log", "w", encoding="utf-8") as f:
-            f.write(traceback.format_exc())
-            f.write(f"\nRequest: {request}\n")
-        raise HTTPException(status_code=500, detail={"status": "error", "message": f"生成失败：{str(e)}", "data": {}})
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "error",
+                "message": f"评估失败：{str(e)}",
+                "data": {}
+            }
+        )
 
+
+# 启动服务
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("api.main:app", host="0.0.0.0", port=8010, reload=True, log_level="info")
+
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,  # 热重载
+        log_level="info"
+    )

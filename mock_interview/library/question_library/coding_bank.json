@@ -1,0 +1,112 @@
+{
+  "coding": [
+    {
+      "id": "0001",
+      "func": "ans_0001",
+      "title": "两数之和",
+      "difficulty": "简单",
+      "description": "给定一个整数数组 nums 和一个目标值 target，请你在数组中找出和为 target 的两个整数，并返回它们的数组下标。",
+      "input": "nums = [2,7,11,15], target = 9",
+      "output": "[0,1]"
+    },
+    {
+      "id": "0002",
+      "func": "ans_0002",
+      "title": "反转列表",
+      "difficulty": "简单",
+      "description": "输入一个整数列表，将列表原地反转并返回。",
+      "input": "[1,2,3,4]",
+      "output": "[4,3,2,1]"
+    },
+    {
+      "id": "0003",
+      "func": "ans_0003",
+      "title": "合并两个有序数组",
+      "difficulty": "简单",
+      "description": "给你两个有序整数数组 nums1 和 nums2，请你将 nums2 合并到 nums1 中，使 nums1 成为一个有序数组。",
+      "input": "nums1 = [1,2,3], nums2 = [2,5,6]",
+      "output": "[1,2,2,3,5,6]"
+    },
+    {
+      "id": "0004",
+      "func": "ans_0004",
+      "title": "爬楼梯",
+      "difficulty": "简单",
+      "description": "假设你正在爬楼梯，需要 n 阶才能到达楼顶。每次只能爬 1 或 2 个台阶，请问有多少种不同的方法可以爬到楼顶？",
+      "input": "n=3",
+      "output": "3"
+    },
+    {
+      "id": "0005",
+      "func": "ans_0005",
+      "title": "最大子数组和",
+      "difficulty": "简单",
+      "description": "给定一个整数数组 nums，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。",
+      "input": "nums = [-2,1,-3,4,-1,2,1,-5,4]",
+      "output": "6"
+    },
+    {
+      "id": "0006",
+      "func": "ans_0006",
+      "title": "无重复字符的最长子串",
+      "difficulty": "中等",
+      "description": "给定一个字符串 s，请你找出其中不含有重复字符的最长子串的长度。",
+      "input": "s = \"abcabcbb\"",
+      "output": "3"
+    },
+    {
+      "id": "0007",
+      "func": "ans_0007",
+      "title": "三数之和",
+      "difficulty": "中等",
+      "description": "给你一个整数数组 nums，判断是否存在三元组 [nums[i], nums[j], nums[k]] 满足 i != j、i != k 且 j != k，同时还满足 nums[i] + nums[j] + nums[k] == 0。请你返回所有和为 0 且不重复的三元组。",
+      "input": "nums = [-1,0,1,2,-1,-4]",
+      "output": "[[-1,-1,2],[-1,0,1]]"
+    },
+    {
+      "id": "0008",
+      "func": "ans_0008",
+      "title": "二叉树的中序遍历",
+      "difficulty": "中等",
+      "description": "给定一个二叉树的根节点 root，返回它的中序遍历。",
+      "input": "root = [1,null,2,3]",
+      "output": "[1,3,2]"
+    },
+    {
+      "id": "0009",
+      "func": "ans_0009",
+      "title": "合并K个升序链表",
+      "difficulty": "困难",
+      "description": "给你一个链表数组，每个链表都已经按升序排列。请你将所有链表合并到一个升序链表中，返回合并后的链表。",
+      "input": "lists = [[1,4,5],[1,3,4],[2,6]]",
+      "output": "[1,1,2,3,4,4,5,6]"
+    },
+    {
+      "id": "0010",
+      "func": "ans_0010",
+      "title": "寻找两个正序数组的中位数",
+      "difficulty": "困难",
+      "description": "给定两个大小分别为 m 和 n 的正序（从小到大）数组 nums1 和 nums2。请你找出并返回这两个正序数组的中位数。",
+      "input": "nums1 = [1,3], nums2 = [2]",
+      "output": "2.0"
+    },
+    {
+      "id": "0011",
+      "func": "ans_0011",
+      "title": "正则表达式匹配",
+      "difficulty": "困难",
+      "description": "给你一个字符串 s 和一个字符规律 p，请你来实现一个支持 '.' 和 '*' 的正则表达式匹配。'.' 匹配任意单个字符，'*' 匹配零个或多个前面的那个元素。",
+      "input": "s = \"aa\", p = \"a*\"",
+      "output": "true"
+    },
+    {
+      "id": "0012",
+      "func": "ans_0012",
+      "title": "最长有效括号",
+      "difficulty": "困难",
+      "description": "给你一个只包含 '(' 和 ')' 的字符串，找出最长有效（格式正确且连续）括号子串的长度。",
+      "input": "s = \")()())\"",
+      "output": "4"
+    }
+  ]
+}

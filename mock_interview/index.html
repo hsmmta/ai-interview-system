@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>编程面试</title>
+    <style>
+        body { max-width: 1000px; margin: 20px auto; padding: 0 20px; font-family: Arial }
+        #result { margin-top:20px; padding:15px; background:#f7f7f7; border-radius:8px; white-space:pre-wrap; font-size:14px; line-height:1.5 }
+        button { padding: 8px 16px; margin-right:10px; font-size:15px; cursor:pointer }
+    </style>
+</head>
+<body>
+    <h2>题目：<span id="title">-</span></h2>
+    <h3>难度：<span id="diff">-</span></h3>
+    <h3>剩余时间：<span id="timer">0:00</span></h3>
+    <div id="desc" style="white-space:pre-wrap; margin:16px 0; font-size:15px;"></div>
+
+    <textarea id="code" style="width:100%; height:330px; font-size:16px; padding:12px; box-sizing:border-box;">
+# 请编写 solution 函数
+def solution():
+    return
+    </textarea>
+
+    <div style="margin-top:12px">
+        <button onclick="runTest()">运行自测</button>
+        <button onclick="submitCode()">提交代码</button>
+    </div>
+    <div id="result"></div>
+
+    <script>
+        let remain = 0;
+        let interval = null;
+        let currentQid = "";
+        let difficulty = "";
+        let finished = false;
+
+        // 自动刷新题目
+        window.onload = () => {
+            loadQuestion();
+            setInterval(() => {
+                if(!finished) fetchStatus();
+            }, 2000);
+        };
+
+        // 拉取题目
+        async function loadQuestion() {
+            let res = await fetch("/get_current_question");
+            let q = await res.json();
+            if(!q.id) return;
+
+            currentQid = q.id;
+            difficulty = q.difficulty || "简单";
+            document.getElementById("title").innerText = q.title || "-";
+            document.getElementById("diff").innerText = q.difficulty || "-";
+            document.getElementById("desc").innerText = q.description || "-";
+
+            finished = false;
+            fetch("/reset_coding_status");
+            startTimer();
+        }
+
+        // 计时器
+        function startTimer() {
+            clearInterval(interval);
+            if(difficulty==="简单") remain=1200;
+            else if(difficulty==="中等") remain=1800;
+            else remain=2400;
+
+            interval = setInterval(()=>{
+                if(finished) return clearInterval(interval);
+                remain--;
+                let m = Math.floor(remain/60);
+                let s = remain%60;
+                document.getElementById("timer").innerText = `${m}:${s.toString().padStart(2,'0')}`;
+                if(remain <= 0) {
+                    clearInterval(interval);
+                    finished = true;
+                    fetch("/user_timeout");
+                    alert("时间到！");
+                }
+            },1000);
+        }
+
+        // 运行自测
+        async function runTest() {
+            let code = document.getElementById("code").value.trim();
+            if(!code) return alert("请输入代码");
+            document.getElementById("result").innerText = "运行中...";
+            let res = await fetch("/api/code", {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({ qid:currentQid, code, action:"test" })
+            });
+            showResult(await res.json());
+        }
+
+        // 提交
+        async function submitCode() {
+            if(finished) return alert("已提交/超时");
+            finished = true;
+            clearInterval(interval);
+            let code = document.getElementById("code").value.trim();
+            document.getElementById("result").innerText = "提交判题中...";
+
+            let judge = await fetch("/api/code", {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({ qid:currentQid, code, action:"submit" })
+            });
+            let data = await judge.json();
+            await fetch("/user_submit", {
+                method:"POST", headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({ qid:currentQid, code, action:"submit" })
+            });
+            showResult(data);
+            alert("提交成功！等待面试官下一题...");
+        }
+
+        // 展示结果
+        function showResult(data) {
+            let s = "===== 判题结果 =====\n";
+            if(data.error) {
+                s += "错误：" + data.error;
+            } else {
+                let pass = data.result.filter(x=>x.passed).length;
+                let total = data.result.length;
+                s += `通过：${pass}/${total}\n`;
+                s += `耗时：${data.exec_time}s\n`;
+                s += `内存：${data.memory}KB\n\n`;
+                data.result.slice(0,5).forEach(item=>{
+                    s += item.passed ? `用例${item.case} 通过\n` : `用例${item.case} 失败\n`;
+                });
+            }
+            document.getElementById("result").innerText = s;
+        }
+
+        // 状态同步 + 自动下一题
+        async function fetchStatus() {
+            let res = await fetch("/get_coding_status");
+            let st = await res.json();
+            if(st.finished) return;
+            let qres = await fetch("/get_current_question");
+            let q = await qres.json();
+            if(q.id !== currentQid) loadQuestion();
+        }
+    </script>
+</body>
+</html>

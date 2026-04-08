@@ -63,7 +63,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label>节点内容</label> jie
+            <label>节点内容</label>
             <textarea v-model="manualNode.name" rows="2" placeholder="输入名称或题目内容"></textarea>
           </div>
           <div class="form-group">
@@ -315,10 +315,12 @@ const loadGraphData = async () => {
       }
 
       if (network) {
+        network.setOptions({ physics: true })
         network.setData(data)
       } else if (networkContainer.value) {
         network = new Network(networkContainer.value, data, options)
 
+        // 原有的点击事件
         network.on("click", function (params) {
           if (params.nodes.length > 0) {
             const nodeId = params.nodes[0]
@@ -327,6 +329,12 @@ const loadGraphData = async () => {
           } else {
             selectedNode.value = null
           }
+        })
+        network.on("stabilizationIterationsDone", function () {
+          network.setOptions({ physics: false })
+        })
+        network.on("stabilized", function () {
+          network.setOptions({ physics: false })
         })
       }
     }
