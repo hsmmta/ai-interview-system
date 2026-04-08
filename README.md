@@ -37,6 +37,7 @@
 - **图引擎**: Neo4j-driver / Vis-Network
 
 ### 后端与 AI (Backend & AI)
+- **Java Web 后端**: Servlet, JSP, Maven, Tomcat 7 (处理登录注册及核心业务转发)
 - **主框架**: FastAPI (Python)
 - **AI 编排**: CrewAI (多智能体架构框架)
 - **大预言模型**: DeepSeek API (核心推理与生成)
@@ -49,23 +50,35 @@
 ## 🚀 快速启动 (Getting Started)
 
 ### 1. 环境准备 (Prerequisites)
+- [Java JDK](https://www.oracle.com/java/technologies/downloads/) (建议 JDK 8 或以上) & [Maven](https://maven.apache.org/)
 - [Node.js](https://nodejs.org/) (建议 18+)
 - [Python](https://www.python.org/) 3.10+ (建议使用 Conda 虚拟环境)
 - FFmpeg (用于音频处理及 SenseVoice 解析)
 - Neo4j 实例 (本地或 AuraDB 云端)
 
-### 2. 前端部署 (Frontend Setup)
+### 2. Java 后端部署 (Java Backend Setup)
+根目录是一个标准的 Maven Web 工程，使用 Tomcat 7 插件启动：
+
+```bash
+# 在项目根目录执行
+mvn clean install
+
+# 启动 Tomcat 服务 (默认运行在 8080 端口)
+mvn tomcat7:run
+```
+
+### 3. 前端部署 (Frontend Setup)
 ```bash
 cd frontend
 # 安装依赖
 npm install
 
-# 启动开发服务器 (默认端口 3000 左右)
+# 启动开发服务器 (默认端口 3000或5173左右)
 npm run dev
 ```
 
-### 3. 后端部署 (Backend Setup)
-后端主要分为两个服务模块：主线模拟面试 API 与 SenseVoice 语音识别 API。
+### 4. Python 后端部署 (Python Backend Setup)
+后端 AI 服务主要分为两个模块：主线模拟面试 API 与 SenseVoice 语音识别 API。
 
 ```bash
 cd mock_interview
@@ -105,4 +118,3 @@ uvicorn sensevoice_api:app --host 127.0.0.1 --port 8020 --reload
 ## 📝 注意事项
 - 由于系统调用了真实的 LLM 和阿里云服务，请务必保证配置文件（`.env`）中的 Token/Key 真实有效。
 - Windows 环境下进行语音测试时，若遇到缺少 `ffprobe` / `ffmpeg` 报错，请手动下载 FFmpeg 并将其 bin 目录配置到系统环境变量 `PATH` 中。
-
