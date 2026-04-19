@@ -62,9 +62,9 @@ const router = useRouter()
 const route = useRoute()
 
 const questions = ref([
-  { id: 1, text: "题目1：请找出一小段 Python 代码中的逻辑/语法错误并修正。\n\ndef fibonacci(n):\n    if n = 0:\n        return 0\n    elif n == 1\n        return 1\n    else:\n        return fibonacci(n-1) + fibonacci(n-2)" },
-  { id: 2, text: "题目2：实现一个简单的 LRU (Least Recently Used) 缓存策略类（只要求基本功能结构即可）。" },
-  { id: 3, text: "题目3：进阶题：请使用你熟悉的语言，描述并写出一段能处理并发任务控制（例如限制最大并发数为10的请求函数）的代码逻辑或伪代码。" }
+  { id: 1, text: "正在加载题目...", raw: {} },
+  { id: 2, text: "正在加载题目...", raw: {} },
+  { id: 3, text: "正在加载题目...", raw: {} }
 ])
 
 const answers = ref(['', '', ''])
@@ -74,6 +74,17 @@ const selectedLanguage = ref('python')
 
 const timeLeft = ref(600)
 let timer = null
+
+const fetchQuestions = async () => {
+  try {
+    const res = await axios.get('/api/fastapi/coding/questions')
+    if (res.data && res.data.status === 'success' && res.data.data.length > 0) {
+      questions.value = res.data.data
+    }
+  } catch (e) {
+    console.error('获取编程题失败:', e)
+  }
+}
 
 const startTimer = () => {
   clearInterval(timer)
@@ -97,7 +108,8 @@ const formattedTime = computed(() => {
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
 })
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchQuestions()
   startTimer()
 })
 
@@ -139,11 +151,17 @@ const nextQuestion = async () => {
          q3: answers.value[2],
       }
 
+      // 将代码结果格式化供后端阅读
+      const formattedCodingResults = {}
+      if (questions.value[0]) formattedCodingResults[`${questions.value[0].id}`] = answers.value[0]
+      if (questions.value[1]) formattedCodingResults[`${questions.value[1].id}`] = answers.value[1]
+      if (questions.value[2]) formattedCodingResults[`${questions.value[2].id}`] = answers.value[2]
+
       const payload = {
         session_id: route.query.sessionId,
         user_info: `应聘岗位：${sessionStorage.getItem('postPosition')}，简历内容：${sessionStorage.getItem('resumeText')}`,
         user_answers: interviewSession,
-        coding_results: codingResults
+        coding_results: formattedCodingResults
       }
 
       console.log('提交最终评估:', payload)

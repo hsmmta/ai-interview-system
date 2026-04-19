@@ -39,8 +39,67 @@ class BaseResponse(BaseModel):
     is_finished: bool = False  # 额外给submit接口用的标志
     session_id: str = ""
 
+# 定义编码题响应
+class CodingQuestionsResponse(BaseModel):
+    status: str
+    message: str
+    data: list = []
+
 # 全局内存字典，用于保持会话状态
 SESSIONS = {}
+
+# 获取编程测试题目
+@app.get("/api/coding/questions", response_model=CodingQuestionsResponse)
+async def get_coding_questions():
+    try:
+        import json
+        import random
+        coding_bank_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'library', 'question_library', 'coding_bank.json')
+        with open(coding_bank_path, 'r', encoding='utf-8') as f:
+            coding_question_bank = json.load(f)["coding"]
+
+        easy_q = [q for q in coding_question_bank if q["difficulty"] == "简单"]
+        medium_q = [q for q in coding_question_bank if q["difficulty"] == "中等"]
+        hard_q = [q for q in coding_question_bank if q["difficulty"] == "困难"]
+
+        selected_questions = []
+        if easy_q:
+            selected_questions.append(random.choice(easy_q))
+        if medium_q:
+            selected_questions.append(random.choice(medium_q))
+        if hard_q:
+            selected_questions.append(random.choice(hard_q))
+
+        # 补齐不足3题的情况
+        while len(selected_questions) < 3 and coding_question_bank:
+            q = random.choice(coding_question_bank)
+            if q not in selected_questions:
+                selected_questions.append(q)
+
+        # 格式化给前端
+        formatted_questions = []
+        for i, q in enumerate(selected_questions[:3]):
+            text = f"题目{i+1}：{q['title']}（{q['difficulty']}）\n\n描述：{q['description']}\n输入示例：{q['input']}\n输出示例：{q['output']}"
+            formatted_questions.append({
+                "id": q["id"],
+                "text": text,
+                "raw": q  # 可以保留原始信息供判题使用
+            })
+
+        return CodingQuestionsResponse(
+            status="success",
+            message="获取成功",
+            data=formatted_questions
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "status": "error",
+                "message": f"获取编程题失败：{str(e)}",
+                "data": []
+            }
+        )
 
 # 接口1：非交互式生成面试结果（仅供测试使用）
 @app.post("/api/interview/generate", response_model=BaseResponse)
